@@ -442,7 +442,7 @@ function elapsd() {
                     var suffix_key = key.split('-')[3];
                         
                     var start = d3.min(value.map(function(x) { return x[0]; }));
-                    var stop = d3.max(value.map(function(x) { return x[0]; }));
+                    var stop = d3.max(value.map(function(x) { return x[1]; }));
 
                     if (suffix_key != suffixes[suffix_key]) {
                         new_key = prefix_key + "-" + suffixes[suffix_key];
