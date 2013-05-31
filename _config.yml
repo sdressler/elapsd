@@ -1,7 +1,2 @@
 name: elapsd
 pygments: true
-
-analytics :
-  provider : google 
-  google : 
-      tracking_id : 'UA-32364726-2'
