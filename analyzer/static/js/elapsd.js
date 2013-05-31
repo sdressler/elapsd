@@ -126,12 +126,13 @@ function elapsd() {
     
     var $_chart_seconds = $("#chart_seconds");
 
+/*    
     var statistics = d3.select('#statistics')
                        .append("svg:svg")
                        .attr("id", "statistics_svg")
                        .attr("width", "100%");
     var $_statistics = $("#statistics_svg");
-                         
+*/                         
 
     d3.select("#drawing").append('div')
                          .attr('class', 'chart tag')
@@ -198,11 +199,11 @@ function elapsd() {
             $_chart_seconds.innerHeight() -
             chart_top_space);
 
-        $_statistics.innerHeight($_chart.innerHeight());
-        $_statistics.css('top', $_chart.css('top'));
+        $("#statistics").innerHeight($_chart.innerHeight());
+        $("#statistics").css('top', $_chart.css('top'));
 
         $_chart.css('margin-top', chart_top_space);
-        $_statistics.css('margin-top', chart_top_space);
+        $("#statistics").css('margin-top', chart_top_space + 5);
 
         // Replace overlay message
         $("#overlay_msg").css('top', $(window).innerHeight() / 2 + 100).hide();
@@ -521,47 +522,27 @@ function elapsd() {
 
         // Update scales
         e.updateScales('both');
-        
         e.replot();
 
-        d3.selectAll(".stat_text").remove();
-        var num_groups = Object.keys(this._thread_groups).length;
-        //for (i = 0; i < this._total_num_threads; i++) {
-        $.each(this._thread_groups, function(key,value) {
-            text = d3.select("#statistics_svg")
-              .append("text")
-              .attr("class", "labels stat_text")
-              .attr("x", 10)
-              .attr("fill", "#fff");
-
-            text.append("tspan")
-                .attr("x", 0)
-                .attr("dy", 0)
-                .text("Wall-Time: " +
-                      ((value.stop - value.start) / 1.0e9).toFixed(9) + " s");
-/*
-            text.append("tspan")
-                .attr("x", 0)
-                .attr("dy", "1em")
-                .text("Run-Time: " + value.run_time + " s");
-            
-            text.append("tspan")
-                .attr("x", 0)
-                .attr("dy", "1em")
-                .text("Wall-Time: " + value.wall_time + " s");
-
-            text.append("tspan")
-                .attr("x", 0)
-                .attr("dy", "1em")
-                .text("Mean Duration: " + (value.run_time / value.num_calls).toFixed(9) + " s");
-*/
-            text.attr("y", y(value.group_id / num_groups) + 10); // + (e._bar_height - $(text[0]).height() + chart_top_space) / 2);
-
-        });
+        if (this._statistics_width > 0) { this.genStats(); }
         
         overlayToggle('hide');
     
     };
+    
+    this.genStats = function() {    
+        d3.selectAll(".stat_text").remove();
+        $(".stat_text").remove();
+        $.each(this._thread_groups, function(key,value) {
+
+            $('<div />', {
+               'class': 'stat_text labels',
+               'style': 'border-left-color: ' + value.color + ";",
+               'text': "Wall-Time: " + ((value.stop - value.start) / 1.0e9).toFixed(9) + " s"
+            }).appendTo("#statistics");
+
+        });
+    }
 
     function getPrecision(number) {
         if (number === 0) { number = 1; }
@@ -690,6 +671,8 @@ function elapsd() {
 
             thread_group.start = Math.min(thread_group.start, data[key].start);
             thread_group.stop  = Math.max(thread_group.start, data[key].stop);
+            thread_group.color = e.exp_selection[subkeys[0]]
+                                  .exp_data[subkeys[1] + '-' + subkeys[2]].color;
             
             prepared_draw_data.push({
                 'data': data[key],
@@ -984,8 +967,10 @@ function elapsd() {
     $("#statistics_check").change(function(ev) {
         if ($(this).is(':checked')) {
             e._statistics_width = 250;
+            e.genStats();
         } else {
             e._statistics_width = 0;
+            d3.selectAll(".stat_text").remove();
         }
         e.resizeDocument();
     });

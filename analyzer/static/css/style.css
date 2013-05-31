@@ -106,6 +106,15 @@ body {
     font-size: 10pt;
 }
 
+.stat_text {
+    font-weight: bold;
+    border-left: 20px solid #fff;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
 .tag {
     position: fixed;
     text-align: center;

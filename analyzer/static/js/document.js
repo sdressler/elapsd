@@ -19,7 +19,7 @@ $(document).ready(function() {
         param = value.split('=');
 
         if (param[0] == '_debugmode' && param[1] == 'true') {
-            e.changeDB("GLAT1.1.db", db_selector);
+            e.changeDB("kmeans.db", db_selector);
         }
     });
 
