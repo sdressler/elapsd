@@ -1,0 +1,12 @@
+*.mod
+*.so
+*.o
+*.pyc
+*.swp
+c_example
+cpp_example
+f_example
+multidevice
+threads_example
+doc/html
+doc/latex

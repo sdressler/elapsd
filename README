@@ -1,0 +1,113 @@
+elaps'd
+=======
+
+elaps'd (say: *elapsed*) is a tool for analyzing the run-time of your
+application. It currently supports multi-threaded applications written in C, C++
+or FORTRAN. But wait, there is more: it also provides a web-based for visual
+analysis of the recorded data:
+
+![elaps'd screenshot](doc/elapsd.png)
+
+Currently, one has to manually utilize elaps'd in the application. However, the
+plan is to automate this in future, so the user only has to label functions to
+be measured.
+
+TL;DR Usage Summary
+-------------------
+
+_Definitions:_ Kernel -> The function you want to measure; Device -> The device
+the function runs on (e.g. CPU, GPU, CPU + GPU, ...).
+
+1. Build with `make`
+2. Have a look at the examples
+3. Incorporate elaps'd into your application and generate some DB's
+4. Use the analyzer by issuing `python analyzer.py` and opening
+   <http://localhost:8080> in your browser
+
+Large Developer's Request: Please report Bugs/Improvement Wishes at GitHub.
+
+Requirements
+------------
+
+* For the backend, i.e. the measuring part
+    - C++ compiler with C++03 support
+    - SQLite (>= 3.6)
+    - OpenMP
+    - A C or FORTRAN compiler if you want to build these APIs
+
+* For the frontend, i.e. the visualization part
+    - Python
+    - apsw for your version of SQLite
+    - Flask
+    - HTML5 Browser (best: Google Chrome or Chromium)
+
+Build
+-----
+
+1. Open `Makefile.include` in your favorite editor and adapt settings as
+   necessary. No changes are needed most of the time.
+2. Type `make` in the root of elaps'd directory. This builds the library
+   `libelapsd.so` inside `lib` and the examples inside `examples`.
+3. If you want to install it, copy headers and library (sorry about the manual
+   step! I'll change this in near future).
+
+Usage
+-----
+
+### Create Measurements (Backend)
+
+This is a short summary on how to use the backend. Please have a look at the
+provided examples for more details.
+
+1. Include `elapsd/elapsd.h` for C++, `elapsd/celapsd.h` for C. For FORTRAN, use
+   `elapsd/m_elapsd.mod`. All these are in the `include` directory.
+2. Initialize elaps'd. C++ users simply do e.g. `ENHANCE::elapsd e("elapsd.db",
+   "Experiment Name");` (watch out for the namespace!). C users call
+   `elapsdInit`, so do FORTRAN users.
+3. Use `addKernel` and `addDevice` function calls to add kernels and devices.
+4. Use `startTimer` and `stopTimer` to start and stop measurements. Please
+   consider that `startTimer` must be called prior `stopTimer` and that to every
+   `startTimer` a `stopTimer` belongs.
+5. Once you finished all measurements call `std::cout << e << "\n"` for
+   summarized output and/or the `commitToDB()` function to write the data to
+   SQLite for further analysis.
+
+### Use the Analyzer (Frontend)
+
+1. Copy the generated DB to `static/db` which is inside the `analyzer`
+   directory. This step will be relaxed in near future letting you configure the
+   path to the DB's.
+2. Start the analyzer's integrated Flask-based webserver by calling `python
+   analyzer.py`.
+3. Open your favorite browser (I recommend Google Chrome or Chromium for best
+   user experience) and point it to <http://localhost:8080>
+4. Select the DB you want to work with and start analyzing!
+
+Changelog
+---------
+
+* 2013-05-31 -- v0.1
+    - Initial release
+
+Author information
+------------------
+
+* Author: Sebastian Dreßler
+* Company: Zuse Institute Berlin
+* Mail: [lastname][at][zib][dot][de]
+
+elaps'd is developed as part of the ENHANCE project (for further info visit
+http://www.enhance-project.de) which is funded by German ministry for education
+and reserach (BMBF). BMBF grant no.: 01IH11004A-G
+
+License
+-------
+
+elaps'd an all self-written parts of it is licensed under the 3-clause BSD
+license. The full license text is provided in the file LICENSE.
+
+Disclaimer
+---------
+
+This software is currently in a very early stadium. There is no guarantee that
+measurements are consistently correct and that there are no major bugs.
