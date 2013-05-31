@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Elapsd by sdressler</title>
+    <title>elaps'd by sdressler</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,8 +15,8 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Elapsd</h1>
-        <p>elapsd -- application run-time analysis with ease</p>
+        <h1>elaps'd</h1>
+        <p>elaps'd -- application run-time analysis with ease</p>
 
         <p class="view"><a href="https://github.com/sdressler/elapsd">View the Project on GitHub <small>sdressler/elapsd</small></a></p>
 
@@ -28,37 +28,134 @@
         </ul>
       </header>
       <section>
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <h1>
+<a name="elapsd" class="anchor" href="#elapsd"><span class="octicon octicon-link"></span></a>elaps'd</h1>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>elaps'd (say: <em>elapsed</em>) is a tool for analyzing the run-time of your
+application. It currently supports multi-threaded applications written in C, C++
+or FORTRAN. But wait, there is more: it also provides a web-based for visual
+analysis of the recorded data:</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<p><img src="https://raw.github.com/sdressler/elapsd/master/doc/elapsd.png" alt="elaps'd screenshot"></p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Currently, one has to manually utilize elaps'd in the application. However, the
+plan is to automate this in future, so the user only has to label functions to
+be measured.</p>
+
+<h2>
+<a name="tldr-usage-summary" class="anchor" href="#tldr-usage-summary"><span class="octicon octicon-link"></span></a>TL;DR Usage Summary</h2>
+
+<p><em>Definitions:</em> Kernel -&gt; The function you want to measure; Device -&gt; The device
+the function runs on (e.g. CPU, GPU, CPU + GPU, ...).</p>
+
+<ol>
+<li>Build with <code>make</code>
+</li>
+<li>Have a look at the examples</li>
+<li>Incorporate elaps'd into your application and generate some DB's</li>
+<li>Use the analyzer by issuing <code>python analyzer.py</code> and opening
+<a href="http://localhost:8080">http://localhost:8080</a> in your browser</li>
+</ol><p>Large Developer's Request: Please report Bugs/Improvement Wishes at GitHub.</p>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>
+<p>For the backend, i.e. the measuring part</p>
+
+<ul>
+<li>C++ compiler with C++03 support</li>
+<li>SQLite (&gt;= 3.6)</li>
+<li>OpenMP</li>
+<li>A C or FORTRAN compiler if you want to build these APIs</li>
+</ul>
+</li>
+<li>
+<p>For the frontend, i.e. the visualization part</p>
+
+<ul>
+<li>Python</li>
+<li>apsw for your version of SQLite</li>
+<li>Flask</li>
+<li>HTML5 Browser (best: Google Chrome or Chromium)</li>
+</ul>
+</li>
+</ul><h2>
+<a name="build" class="anchor" href="#build"><span class="octicon octicon-link"></span></a>Build</h2>
+
+<ol>
+<li>Open <code>Makefile.include</code> in your favorite editor and adapt settings as
+necessary. No changes are needed most of the time.</li>
+<li>Type <code>make</code> in the root of elaps'd directory. This builds the library
+<code>libelapsd.so</code> inside <code>lib</code> and the examples inside <code>examples</code>.</li>
+<li>If you want to install it, copy headers and library (sorry about the manual
+step! I'll change this in near future).</li>
+</ol><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="create-measurements-backend" class="anchor" href="#create-measurements-backend"><span class="octicon octicon-link"></span></a>Create Measurements (Backend)</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>This is a short summary on how to use the backend. Please have a look at the
+provided examples for more details.</p>
+
+<ol>
+<li>Include <code>elapsd/elapsd.h</code> for C++, <code>elapsd/celapsd.h</code> for C. For FORTRAN, use
+<code>elapsd/m_elapsd.mod</code>. All these are in the <code>include</code> directory.</li>
+<li>Initialize elaps'd. C++ users simply do e.g. <code>ENHANCE::elapsd e("elapsd.db",
+"Experiment Name");</code> (watch out for the namespace!). C users call
+<code>elapsdInit</code>, so do FORTRAN users.</li>
+<li>Use <code>addKernel</code> and <code>addDevice</code> function calls to add kernels and devices.</li>
+<li>Use <code>startTimer</code> and <code>stopTimer</code> to start and stop measurements. Please
+consider that <code>startTimer</code> must be called prior <code>stopTimer</code> and that to every
+<code>startTimer</code> a <code>stopTimer</code> belongs.</li>
+<li>Once you finished all measurements call <code>std::cout &lt;&lt; e &lt;&lt; "\n"</code> for
+summarized output and/or the <code>commitToDB()</code> function to write the data to
+SQLite for further analysis.</li>
+</ol><h3>
+<a name="use-the-analyzer-frontend" class="anchor" href="#use-the-analyzer-frontend"><span class="octicon octicon-link"></span></a>Use the Analyzer (Frontend)</h3>
+
+<ol>
+<li>Copy the generated DB to <code>static/db</code> which is inside the <code>analyzer</code>
+directory. This step will be relaxed in near future letting you configure the
+path to the DB's.</li>
+<li>Start the analyzer's integrated Flask-based webserver by calling <code>python
+analyzer.py</code>.</li>
+<li>Open your favorite browser (I recommend Google Chrome or Chromium for best
+user experience) and point it to <a href="http://localhost:8080">http://localhost:8080</a>
+</li>
+<li>Select the DB you want to work with and start analyzing!</li>
+</ol><h2>
+<a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h2>
 
 <h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<a name="2013-05-31----v01" class="anchor" href="#2013-05-31----v01"><span class="octicon octicon-link"></span></a>2013-05-31 -- v0.1</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<ul>
+<li>Initial release</li>
+</ul><h2>
+<a name="author-information" class="anchor" href="#author-information"><span class="octicon octicon-link"></span></a>Author information</h2>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<ul>
+<li>Author: Sebastian Dreßler</li>
+<li>Company: Zuse Institute Berlin</li>
+<li>Mail: [lastname][at][zib][dot][de]</li>
+</ul><p>elaps'd is developed as part of the ENHANCE project (for further info visit
+<a href="http://www.enhance-project.de">http://www.enhance-project.de</a>) which is funded by German ministry for education
+and reserach (BMBF). BMBF grant no.: 01IH11004A-G</p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p>elaps'd an all self-written parts of it is licensed under the 3-clause BSD
+license. The full license text is provided in the file LICENSE.</p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<h2>
+<a name="disclaimer" class="anchor" href="#disclaimer"><span class="octicon octicon-link"></span></a>Disclaimer</h2>
+
+<p>This software is currently in a very early stadium. There is no guarantee that
+measurements are consistently correct and that there are no major bugs.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/sdressler">sdressler</a></p>
@@ -66,6 +163,16 @@ $ git checkout gh-pages
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-32364726-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
