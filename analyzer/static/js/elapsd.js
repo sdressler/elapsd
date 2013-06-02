@@ -487,7 +487,7 @@ function elapsd() {
                 ];
 
                 $.each(db_data, function(key, value) {
-                    
+                   
                     var subkeys = key.split("-");
                     var new_key = "";
 
@@ -504,7 +504,7 @@ function elapsd() {
                     }
 
                 });
-                
+               
                 e.max_value = d3.max(max);
                 e.changeDisplay();
 
@@ -809,7 +809,7 @@ function elapsd() {
             var hi = bisect_r(data, x.domain()[1]) + 1;
 
             if (lo == -1) { lo = 0; }
-            if (hi > (data.length - 1)) { hi = data.length - 1; }
+            if (hi > (data.length - 1)) { hi = data.length; }
 
             /* This merges elements that are to close to each other */
             data_array = [[x(data[lo][0]),x(data[lo][1])]];
@@ -827,7 +827,7 @@ function elapsd() {
                     j++;
                 }
             }
-            
+           
             draw_data.push({
                 'data': data_array,
                 'y_idx': obj.y_idx,
