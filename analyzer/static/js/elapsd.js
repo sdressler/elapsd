@@ -105,7 +105,13 @@ function elapsd() {
                   .attr('x2', pos + 0.5)
                   .attr('y1', 0)
                   .attr('y2', $_chart.innerHeight())
-                  .style("stroke", "#fff")
+                  .style("stroke", function() {
+                        if ($("#bg_light").is(':checked')) {
+                            return "#000" 
+                        }
+
+                        return "#fff"
+                  })
                   .style("stroke-width", "1.5px");
 
             })
@@ -561,6 +567,10 @@ function elapsd() {
                 '<dd>' + value.ethreads + '</dd>'     
             ).appendTo(div);
 
+            if ($("#bg_light").is(':checked')) {
+                div.css('color', '#000');
+            }
+
         });
     }
 
@@ -885,7 +895,7 @@ function elapsd() {
              .attr("y1", 0)
              .attr("y2", $_chart.innerHeight())
              .attr("id", "vgrid")
-             .style("stroke", "#bbb")
+             .style("stroke", "#888")
              .style("stroke-width", "1.5px")
              .style("stroke-dasharray", "5,5");
 
@@ -898,7 +908,13 @@ function elapsd() {
                      .attr("y", $_chart_seconds.height() / 2)
                      .attr("dy", -3)
                      .attr("text-anchor", "middle")
-                     .attr("fill", "#fff")
+                     .style("fill", function() {
+                         if ($("#bg_light").is(':checked')) {
+                            return "#000"
+                         }
+                         return "#fff"
+                     })
+
                      .text(function(value) {
                          return d3.round(value / 1.0e9, 9) + " s";
                      });
@@ -988,7 +1004,12 @@ function elapsd() {
               .attr('x2', pos + 0.5)
               .attr('y1', 0)
               .attr('y2', $_chart.innerHeight())
-              .style("stroke", "#fff")
+              .style("stroke", function() {
+                  if ($("#bg_light").is(':checked')) {
+                     return "#000"
+                  }
+                  return "#fff"
+              })
               .style("stroke-width", "3px")
               .style("stroke-dasharray", "5,5");
 
@@ -1009,6 +1030,17 @@ function elapsd() {
             d3.selectAll(".stat_text").remove();
         }
         e.resizeDocument();
+    });
+
+    $("#bg_light").change(function(ev) {
+        if ($(this).is(':checked')) {
+            $("body").css('background-color', '#fff');
+        //    $(".labels").css('fill', '#000');
+        } else {
+            $("body").css('background-color', '#222'); 
+        //    $(".labels").css('fill', '#fff');
+        }
+        e.changeDisplay();
     });
 
 }
