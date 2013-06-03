@@ -607,11 +607,13 @@ function elapsd() {
             if (this._threadInterleave != 'line') { 
                 this._bar_height = y.range()[1] / this._total_num_threads;
             } else {
+                /*
                 var max_thread_num = 0;
                 $.each(this._thread_groups, function(key,value) {
                     max_thread_num = Math.max(max_thread_num, value.threads);
                 });
-                this._bar_height = y.range()[1] / max_thread_num;
+                */
+                this._bar_height = y.range()[1] / e._exp_total_num_threads;
             }
 
             if ((this._bar_height - this._bar_space) < min_height) {
@@ -663,6 +665,7 @@ function elapsd() {
             if (!(group_key in e._thread_groups)) {
                 e._thread_groups[group_key] = {
                     "group_id": group_id,
+                    "experiment": parseInt(subkeys[0],10),
                     "threads": 0,
                     "ethreads": 0,
                     "y_ends": [],
@@ -703,11 +706,6 @@ function elapsd() {
                 thread_group.threads = thread_group.y_ends.length;
             }
 
-/*
-            } else {
-                y_idx = subkeys[3]; 
-            }
-*/
             thread_group.start = Math.min(thread_group.start, data[key].start);
             thread_group.stop  = Math.max(thread_group.start, data[key].stop);
             thread_group.color = e.exp_selection[subkeys[0]]
@@ -723,24 +721,46 @@ function elapsd() {
         });
 
         this._total_num_threads = 0;
+        this._total_num_selected_experiments = 0;
         var max_num_threads = 0;
         var group_thread_nums = {};
 
+        var exp = {};
+        var exp_count = 0;
         $.each(this._thread_groups, function(key,value) {
             e._total_num_threads += value.threads;
             value.num_threads = value.threads;
             group_thread_nums[value.group_id] = value.threads;
             max_num_threads = Math.max(max_num_threads, value.threads);
+
+            if (!(value.experiment in exp)) {
+                exp[value.experiment] = {
+                    'id': exp_count,
+                    'max_num_threads': value.threads
+                };
+                e._total_num_selected_experiments++;
+                exp_count++;
+            } else {
+                exp[value.experiment].max_num_threads = Math.max(exp[value.experiment].max_num_threads, value.threads); 
+            }
+
+        });
+
+        this._exp_total_num_threads = 0;
+        $.each(exp, function(key,value) {
+            e._exp_total_num_threads += value.max_num_threads;
         });
 
         /* This adjusts the y-position */
         var groups = Object.keys(this._thread_groups).length;
         var offset = 0;
         var prev_gid = 0;
+        var prev_eid = d3.min(Object.keys(exp).map(function(x) { return parseInt(x,10); }));
         var _y = 0;
         $.each(prepared_draw_data, function(key,value) {
 
             var gid = e._thread_groups[value.group_key].group_id;
+            var eid = e._thread_groups[value.group_key].experiment;
             var num_threads = e._thread_groups[value.group_key].num_threads;
 
             _y = value.y_idx;
@@ -759,8 +779,12 @@ function elapsd() {
                 _y = (_y * groups + offset); // / e._total_num_threads;
 
             } else if (e._threadInterleave == 'line' && groups > 1) {
+                if (eid != prev_eid) {
+                    offset = exp[prev_eid].max_num_threads * exp[eid].id;
+                    prev_eid = eid;
+                }
 
-                _y /= max_num_threads;
+                _y = (_y + offset) / e._exp_total_num_threads;
 
             } else {
 
@@ -809,29 +833,6 @@ function elapsd() {
                 e._thread_groups[value.group_key].cputime += point[1] - point[0];
             });
 
-//            console.log(e._thread_groups);
-//            console.log(value);
-
-/*
-            var run_time = 0;
-            $.each(value.data, function(idx,x) {
-                run_time += x[1] - x[0];
-            });
-
-            var wall_time = value.data[value.data.length - 1][1] - value.data[0][0];
-
-            if (!(value.y_idx in e._statistics_data)) {
-                e._statistics_data[value.y_idx] = {
-                    'num_calls': value.data.length,
-                    'run_time': run_time / 1.0e9,
-                    'wall_time': wall_time / 1.0e9
-                };
-            } else {
-                e._statistics_data[value.y_idx].num_calls += value.data.length;
-                e._statistics_data[value.y_idx].run_time += run_time / 1.0e9;
-                e._statistics_data[value.y_idx].wall_time += wall_time / 1.0e9;
-            }
-*/            
         });
 
         return prepared_draw_data;
