@@ -535,11 +535,31 @@ function elapsd() {
         $(".stat_text").remove();
         $.each(this._thread_groups, function(key,value) {
 
-            $('<div />', {
+            var div = $('<div />', {
                'class': 'stat_text labels',
                'style': 'border-left-color: ' + value.color + ";",
-               'text': "Wall-Time: " + ((value.stop - value.start) / 1.0e9).toFixed(9) + " s"
+//               'text': "Wall-Time: " + ((value.stop - value.start) / 1.0e9).toFixed(9) + " s<br />Test!"
             }).appendTo("#statistics");
+
+            $('<dl>').html(
+                '<dt>Wall Time</dt>' + 
+                '<dd>' + ((value.stop - value.start) / 1.0e9).toFixed(9) + ' s</dd>'
+            ).appendTo(div);
+
+            $('<dl>').html(
+                '<dt>Total Time</dt>' + 
+                '<dd>' + (value.cputime / 1.0e9).toFixed(9) + ' s</dd>'
+            ).appendTo(div);
+
+            $('<dl>').html(
+                '<dt>Ø Thread Time</dt>' +
+                '<dd>' + ((value.cputime / value.ethreads) / 1.0e9).toFixed(9) + ' s</dd>'
+            ).appendTo(div);
+
+            $('<dl>').html(
+                '<dt>Max. Act. Threads</dt>' + 
+                '<dd>' + value.ethreads + '</dd>'     
+            ).appendTo(div);
 
         });
     }
@@ -634,10 +654,11 @@ function elapsd() {
                 e._thread_groups[group_key] = {
                     "group_id": group_id,
                     "threads": 0,
-                    "effective_threads": 0,
+                    "ethreads": 0,
                     "y_ends": [],
                     "start": 0,
-                    "stop": 0
+                    "stop": 0,
+                    "cputime": 0
                 };
                 group_id++;
             }
@@ -645,30 +666,38 @@ function elapsd() {
             var thread_group = e._thread_groups[group_key];
                 thread_group.threads++;
 
-            if (e._thread_limit) {
+//            if (e._thread_limit) {
             
-                var found = false;
+            var found = false;
 
-                for (i = 0; i < thread_group.y_ends.length; i++) {
-                    if (data[key][0][0] > thread_group.y_ends[i]) {
-                        y_idx = i;
-                        found = true;
-                        break;
-                    }
+            for (i = 0; i < thread_group.y_ends.length; i++) {
+                if (data[key][0][0] > thread_group.y_ends[i]) {
+                    y_idx = i;
+                    found = true;
+                    break;
                 }
+            }
 
-                if (!found) {
-                    thread_group.y_ends.push(0);
-                    y_idx = thread_group.y_ends.length - 1;
-                }
+            if (!found) {
+                thread_group.y_ends.push(0);
+                y_idx = thread_group.y_ends.length - 1;
+            }
 
-                thread_group.y_ends[y_idx] = data[key][data[key].length - 1][1];
+            thread_group.y_ends[y_idx] = data[key][data[key].length - 1][1];
+            thread_group.ethreads = thread_group.y_ends.length;
+
+
+            if (!e._thread_limit) {
+                y_idx = subkeys[3];
+            } else {
                 thread_group.threads = thread_group.y_ends.length;
+            }
 
+/*
             } else {
                 y_idx = subkeys[3]; 
             }
-
+*/
             thread_group.start = Math.min(thread_group.start, data[key].start);
             thread_group.stop  = Math.max(thread_group.start, data[key].stop);
             thread_group.color = e.exp_selection[subkeys[0]]
@@ -764,9 +793,16 @@ function elapsd() {
 
         /* This collect statistical data */
         //this._statistics_data = {};
-        /*
         $.each(prepared_draw_data, function(key,value) {
 
+            $.each(value.data, function(idx,point) {
+                e._thread_groups[value.group_key].cputime += point[1] - point[0];
+            });
+
+//            console.log(e._thread_groups);
+//            console.log(value);
+
+/*
             var run_time = 0;
             $.each(value.data, function(idx,x) {
                 run_time += x[1] - x[0];
@@ -785,8 +821,8 @@ function elapsd() {
                 e._statistics_data[value.y_idx].run_time += run_time / 1.0e9;
                 e._statistics_data[value.y_idx].wall_time += wall_time / 1.0e9;
             }
+*/            
         });
-        */
 
         return prepared_draw_data;
 
@@ -966,7 +1002,7 @@ function elapsd() {
 
     $("#statistics_check").change(function(ev) {
         if ($(this).is(':checked')) {
-            e._statistics_width = 250;
+            e._statistics_width = 325;
             e.genStats();
         } else {
             e._statistics_width = 0;

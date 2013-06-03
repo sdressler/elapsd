@@ -155,3 +155,15 @@ input[type="text"] {
 	border-radius: 4px;
 }
 
+dl {
+    margin: 0;
+}
+
+dt {
+    float: left;
+/*    min-width: 16ex; */
+}
+
+dd {
+    text-align: right;
+}
