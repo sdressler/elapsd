@@ -1,12 +1,11 @@
 /**
  *
+ * \mainpage test
+ *
  * C wrapper for elapsd (which is written in C++).
  *
  * @author	Sebsatian Dressler
  * @date	2012-05-25
- *
- * \addtogroup Celapsd
- * @{
  *
  * */
 
@@ -137,4 +136,3 @@ void cpp_callback_elapsdCommitToDB(elapsd *e);
 #endif
 
 #endif
-/** @} */

@@ -1,14 +1,3 @@
-/** 
- * Header for ENHANCE Performance Framework (elapsd).
- *
- * @author	Sebastian Dressler (ZIB)
- * @date	2012-05-24
- *
- * \addtogroup elapsd
- * @{
- *
- * */
-
 #ifndef ELAPSD_H
 #define ELAPSD_H
 
@@ -16,7 +5,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <inttypes.h>
-#include <semaphore.h>
 
 // This only checks whether we are on a POSIX system or not
 #ifndef _POSIX_TIMERS
@@ -43,12 +31,21 @@
 #include <sys/syscall.h>
 
 #include "Container.h"
-	
 
 namespace ENHANCE {
 
-typedef std::vector<std::list<elapsdData> > tDataVector;
+    typedef std::vector<std::list<elapsdData> > tDataVector;
 
+/**
+ * This class contains the public interface to elaps'd. Internally, it acts as a
+ * wrapper for all provided methods.
+ *
+ * \author    Sebastian Dreßler (ZIB)
+ * \date      2012-05-24
+ * \version   0.1
+ * \copyright BSD License
+ *
+ * */
 class elapsd : public elapsdContainer {
 private:
     tDataVector data;
@@ -122,31 +119,30 @@ private:
 
 public:
     static struct timespec experiment_starttime;
-
-	//static std::string& getExperimentID() { return experiment_id; }
 	static uint64_t& getExperimentID() { return experiment_id; }
 
     /**
      *
-     * elapsd constructor with optional name for DB file. If the
-     * name is empty, the framework selects "elapsd.db" automatically.
+     * elaps'd constructor with parameters for the name of the DB file and the
+     * current experiment identifier. 
      *
      * @param[in] _dbFileName Where to store the DB
+     * @param[in] _expName    The name of the experiment
      * */
 	elapsd(const std::string &_dbFileName, const std::string &_expName);
 	~elapsd();
 
 	/**
 	 *
-	 * Commit the collected data to a Berkeley DB. If the DB does not yet exist
-	 * it is created.
+	 * Commit the collected data to the DB. If the DB does not exist yet, it
+     * will be created. The name of the DB is set when initializing elaps'd.
 	 * 
 	 * */
     void finalize();
 	void commitToDB();
 
 	/**
-	 * Adds a new kernel to the framework.
+	 * Adds a new kernel to be measured.
 	 *
 	 * @exception std::runtime_error If a kernel with the given ID already exists
 	 * @param[in] ID The unique ID of the kernel
@@ -155,7 +151,7 @@ public:
 	tKernelMap::iterator addKernel(const int ID, const std::string &kName = std::string());
 
 	/**
-	 * Adds a new device to the framework.
+	 * Adds a new device where kernels run on.
 	 *
 	 * @exception std::runtime_error If a device with the given ID already exists
 	 * @param[in] ID The unique ID of the device
@@ -198,6 +194,7 @@ public:
 	/**
 	 * Registers the data to be transferred for a specific kernel / device combination
 	 *
+     * @warning This feature currently is an experimental one.
 	 * @exception std::invalid_argument If the kernel ID or the device ID is invalid (what() provides details)
 	 * @param[in] KernelID The ID of the kernel
 	 * @param[in] DeviceID The ID of the device
@@ -223,5 +220,3 @@ typedef struct elapsd elapsd;
 #endif
 
 #endif /* ELAPSD_H */
-
-/** @} */
