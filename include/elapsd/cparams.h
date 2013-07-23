@@ -7,13 +7,14 @@
  *
  * */
 
-#include "Errors.h"
-#include "params.h"
-
 #ifndef C_MAP_H
 #define C_MAP_H
 
+#include "Params.h"
+
 #ifdef __cplusplus
+
+using namespace ENHANCE;
 
 extern "C" {
 #endif

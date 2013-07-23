@@ -1,9 +1,11 @@
 #include "../include/elapsd/celapsd.h"
 #include "../include/elapsd/elapsd.h"
 
-elapsd* elapsdInit(const char *dbName, const char *expName) {
-	return cpp_callback_elapsdInit(dbName, expName);
-}
+elapsd* elapsdInit(
+    const char *dbName,
+    const char *expName,
+    const elapsdParams *p
+) {	return cpp_callback_elapsdInit(dbName, expName, p); }
 
 int elapsdAddKernel(elapsd *e, int ID, const char *kName) {
 	return cpp_callback_elapsdAddKernel(e, ID, kName);

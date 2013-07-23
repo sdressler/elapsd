@@ -9,11 +9,12 @@
  *
  * */
 
-#include "Errors.h"
-#include "elapsd.h"
-
 #ifndef C_ELAPSD_H
 #define C_ELAPSD_H
+
+#include "Errors.h"
+#include "elapsd.h"
+#include "Params.h"
 
 #ifdef __cplusplus
 
@@ -29,8 +30,16 @@ extern "C" {
  * @retval elapsd Pointer to a valid elapsd object or NULL if something went wrong
  *
  * */
-elapsd* elapsdInit(const char *dbName, const char *expName);
-elapsd* cpp_callback_elapsdInit(const char *dbName, const char *expName);
+elapsd* elapsdInit(
+    const char *dbName,
+    const char *expName,
+    const elapsdParams *p
+);
+elapsd* cpp_callback_elapsdInit(
+    const char *dbName,
+    const char *expName,
+    const elapsdParams *p
+);
 
 /**
  * Adds a new kernel to the framework. The kernel is only added if the ID does

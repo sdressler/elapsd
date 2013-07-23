@@ -2,7 +2,7 @@ include ../Makefile.include
 
 TARGET		 = elapsd
 
-CXXFLAGS	+= -fPIC
+CXXFLAGS	+= -fPIC -I../include
 LDFLAGS		+= -shared
 
 LLIB		+= 
