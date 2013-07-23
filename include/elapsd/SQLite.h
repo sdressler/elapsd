@@ -10,6 +10,8 @@
 #include <sstream>
 #include <inttypes.h>
 
+#include "Helpers.h"
+
 namespace ENHANCE {
 class IElapsdSQLite {
 public:
@@ -27,13 +29,17 @@ private:
         
         sqlite3_stmt *stmt;
 
+        // Check if DB was initialized
         std::string sql = "SELECT COUNT(*) FROM devices";
         int ret = sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, NULL);
 
         if (ret != SQLITE_OK) {
 
-            // DB seems to be empty, so initialize it
-            
+            /*
+             * DB seems to be empty, so initialize it
+             * The following statements create all necessary tables
+             * */
+          
             sql = "CREATE TABLE devices ( \
                     id INTEGER PRIMARY KEY, \
                     name VARCHAR(255) \
@@ -65,25 +71,14 @@ private:
 
             executeInsertQuery(sql);
 
-/*
-            sql = "CREATE TABLE kernelHasConfigurations ( \
-                    id_kernel INTEGER, \
-                    hash VARCHAR(64), \
-                    PRIMARY KEY(id_kernel, hash) \
+            sql = "CREATE TABLE experiment_parameters ( \
+                    id_experiment INTEGER PRIMARY KEY, \
+                    param_name VARCHAR(255), \
+                    param_value INTEGER \
                    )";
 
             executeInsertQuery(sql);
-*/
-/*
-            sql = "CREATE TABLE kernelConfigurations ( \
-                    hash VARCHAR(64), \
-                    key VARCHAR(255), \
-                    value VARCHAR(255), \
-                    PRIMARY KEY(hash, key, value) \
-                   )";
 
-            executeInsertQuery(sql);
-*/
             sql = "CREATE TABLE data ( \
                     id_kernel INTEGER, \
                     id_device INTEGER, \
@@ -105,8 +100,6 @@ private:
         }
 
     }
-
-protected:
 
 public:
     elapsdSQLite(std::string _db_file = "") : db_file(_db_file) {
@@ -134,7 +127,7 @@ public:
 
     void executeInsertQuery(const std::string &q) {
 
-//        std::cout << q << "\n";
+        DMSG("DB Query: " << q);
 
         sqlite3_stmt *stmt;
 
@@ -167,8 +160,8 @@ public:
 
     }
 
-    void beginTransaction() { sqlite3_exec(db, "BEGIN", 0, 0, 0); }
-    void endTransaction() { sqlite3_exec(db, "COMMIT", 0, 0, 0); }
+    void beginTransaction() { sqlite3_exec(db, "BEGIN", 0, 0, 0);  }
+    void endTransaction()   { sqlite3_exec(db, "COMMIT", 0, 0, 0); }
 
 };
 }
