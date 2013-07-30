@@ -26,7 +26,11 @@ std::string     elapsd::experiment_name      = "";
 long int        elapsd::experiment_date      = 0;
 struct timespec elapsd::experiment_starttime = {0,0};
 
-elapsd::elapsd(const std::string &_dbFileName, const std::string &expName) {
+elapsd::elapsd(
+    const std::string &_dbFileName,
+    const std::string &expName,
+    const elapsdParams &_expParams
+) {
 
     if (_dbFileName == std::string("")) {
         dbFileName = std::string("elapsd.db");
@@ -55,14 +59,44 @@ elapsd::elapsd(const std::string &_dbFileName, const std::string &expName) {
     // Write the experiment
     std::stringstream q;
 
-    q << "INSERT OR IGNORE INTO experiments (id, date, name, start_s, start_ns) VALUES("
+    q << "INSERT OR IGNORE INTO experiments ( \
+            id, date, name, start_s, start_ns \
+          ) VALUES("
       << "'" << experiment_id   << "', "
              << experiment_date << ", "
       << "'" << experiment_name << "', "
              << experiment_starttime.tv_sec << ", "
-             << experiment_starttime.tv_nsec << ")";
+             << experiment_starttime.tv_nsec
+      << ")";
 
     db.executeInsertQuery(q.str());
+
+    if (_expParams.empty() == false) {
+    
+        // Cleanup
+        q.str("");
+
+        // Write experiment parameters
+        q << "INSERT OR IGNORE INTO experiment_parameters ( \
+                  id_experiment, param_name, param_value \
+              ) VALUES ";
+
+        std::map<std::string, int>::const_iterator it;
+        for (it = _expParams.begin(); it != _expParams.end(); ++it) {
+            q << "("
+                << experiment_id << ", "
+                << "'" << it->first << "', "
+                << it->second
+              << "), ";
+        }
+
+        // Remove last ", " and execute
+        std::string q_str = q.str();
+        q_str.erase(q_str.end() - 2, q_str.end());
+
+        db.executeInsertQuery(q_str);
+
+    }
 
     DMSG("Initialized");
 

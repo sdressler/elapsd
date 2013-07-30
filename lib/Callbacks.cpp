@@ -7,12 +7,20 @@
 
 using namespace ENHANCE;
 
-elapsd* cpp_callback_elapsdInit(const char *dbName, const char *expName) {
+elapsd* cpp_callback_elapsdInit(
+    const char *dbName,
+    const char *expName,
+    const elapsdParams *p
+) {
 
 	elapsd *e;
 
 	try {
-		e = new elapsd(std::string(dbName), std::string(expName));
+        if (p == NULL) {
+            e = new elapsd(std::string(dbName), std::string(expName));
+        } else {
+            e = new elapsd(std::string(dbName), std::string(expName), *p);
+        }
 	} catch (...) {
 		return NULL;
 	}

@@ -31,6 +31,7 @@
 #include <sys/syscall.h>
 
 #include "Container.h"
+#include "Params.h"
 
 namespace ENHANCE {
 
@@ -128,8 +129,13 @@ public:
      *
      * @param[in] _dbFileName Where to store the DB
      * @param[in] _expName    The name of the experiment
+     * @param[in] _expParams  Experiment related key/value parameters
      * */
-	elapsd(const std::string &_dbFileName, const std::string &_expName);
+	elapsd(
+        const std::string &_dbFileName,
+        const std::string &_expName,
+        const elapsdParams &_expParams = elapsdParams()
+    );
 	~elapsd();
 
 	/**
@@ -148,7 +154,10 @@ public:
 	 * @param[in] ID The unique ID of the kernel
 	 * @param[in] kName The (optional) name of the kernel
 	 * */
-	tKernelMap::iterator addKernel(const int ID, const std::string &kName = std::string());
+	tKernelMap::iterator addKernel(
+        const int ID,
+        const std::string &kName = std::string()
+    );
 
 	/**
 	 * Adds a new device where kernels run on.
@@ -157,7 +166,10 @@ public:
 	 * @param[in] ID The unique ID of the device
 	 * @param[in] dName The (optional) name of the device
 	 * */
-	tDeviceMap::iterator addDevice(const int ID, const std::string &dName = std::string());
+	tDeviceMap::iterator addDevice(
+        const int ID,
+        const std::string &dName = std::string()
+    );
 
 	/**
 	 * Adds a new subdevice to an existing device.
@@ -201,7 +213,12 @@ public:
 	 * @param[in] inBytes  The number of Bytes to be transferred from <b>host to device</b>
 	 * @param[in] outBytes The number of Bytes to be transferred from <b>device to host</b>
 	 * */
-	void addKernelDataVolumes(int KernelID,	int DeviceID, int64_t inBytes, int64_t outBytes);
+	void addKernelDataVolumes(
+        int KernelID,
+        int DeviceID,
+        int64_t inBytes,
+        int64_t outBytes
+    );
 
 	/**
 	 * Prints the content of the object to given std::ostream.

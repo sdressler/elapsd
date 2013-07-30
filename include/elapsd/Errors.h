@@ -25,7 +25,8 @@ enum ERR {
 	E_NOD,	///< Device not found
 	E_TMR,	///< Timer error
 	E_RES,	///< Error in results
-	E_EQU	///< Two given ID's are equal
+	E_EQU,	///< Two given ID's are equal
+    E_PMAP  ///< Error with params map 
 };
 
 #ifdef __cplusplus

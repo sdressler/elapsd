@@ -539,6 +539,7 @@ function elapsd() {
     this.genStats = function() {    
         d3.selectAll(".stat_text").remove();
         $(".stat_text").remove();
+
         $.each(this._thread_groups, function(key,value) {
 
             var div = $('<div />', {

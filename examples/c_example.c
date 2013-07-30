@@ -16,7 +16,7 @@ int main(void) {
     unsigned int f;
     int i, err;
 
-    elapsd *e = elapsdInit("elapsd.db", "Fibonacci C");
+    elapsd *e = elapsdInit("elapsd.db", "Fibonacci C", NULL);
 
     printf("Adding kernel.\n");
     err = elapsdAddKernel(e, 0, "Fibonacci");
