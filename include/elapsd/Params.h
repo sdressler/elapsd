@@ -9,18 +9,18 @@
 namespace ENHANCE {
 
 /**
- * This class contains the public interface to elaps'd. Internally, it acts as a
- * wrapper for all provided methods.
+ *
+ * This class provides an abstraction layer to the key/value data structure used
+ * to store parameters. Its main purpose is to enable a C/FORTRAN interface.
  *
  * \author    Sebastian Dreßler (ZIB)
- * \date      2012-05-24
+ * \date      2013-07-23
  * \version   0.1
  * \copyright BSD License
  *
  * */
-class elapsdParams : public std::map<std::string, int> {
+class elapsdParams : public std::map<std::string, int> { };
 
-};
 }
 
 #else
