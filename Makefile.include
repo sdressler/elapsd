@@ -6,7 +6,7 @@ FC  = gfortran
 # Change these to either activate the C API (CAPI)
 # or the FORTRAN API (FAPI) or both or none
 WITH_CAPI = YES
-WITH_FAPI = YES
+WITH_FAPI = NO
 
 # Change to set maximum number of measurement units
 MAX_UNITS = 1024
@@ -17,10 +17,10 @@ DEBUG =
 
 ### DO NOT TOUCH ###
 
-CFLAGS   = -Wall \
+CFLAGS   = -Wall -Werror=return-type \
            $(if $(DEBUG),-DDEBUG -g -O0,-O3)
            
-CXXFLAGS = -Wall \
+CXXFLAGS = -Wall -Werror=return-type \
            -DMAX_UNITS=$(MAX_UNITS) \
            $(if $(DEBUG),-DDEBUG -g -O0,-O3) \
            -fopenmp
@@ -28,3 +28,21 @@ CXXFLAGS = -Wall \
 FFLAGS = -std=f2003 -J../include/elapsd
 
 LLIB = -lrt -lsqlite3 -fopenmp
+
+# Colors
+NO_COLOR=\x1b[0m
+G_COLOR=\x1b[32;01m
+R_COLOR=\x1b[31;01m
+Y_COLOR=\x1b[33;01m
+
+%.o : %.cpp ${INC}
+	@echo -e " $(G_COLOR)[ CXX ]$(NO_COLOR) : $< -> $@"
+	@$(CXX) $(CXXFLAGS) -c $<
+
+%.o : %.c ${INC}
+	@echo -e " $(G_COLOR)[ CC  ]$(NO_COLOR) : $< -> $@"
+	@$(CC) $(CXXFLAGS) -c $<
+
+%.o : %.F90
+	@echo -e " $(G_COLOR)[ F90 ]$(NO_COLOR) : $< -> $@"
+	@$(FC) $(FFLAGS) -c $<

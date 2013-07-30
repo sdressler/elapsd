@@ -47,7 +47,10 @@ public:
 	inline int getKernelID() const { return KernelID; }
 	inline int getDeviceID() const { return DeviceID; }
     inline int getThreadID() const { return ThreadID; }
-	inline elapsdClock& getTimeStamp() const { return const_cast<elapsdClock&>(timestamp); }
+
+	inline elapsdClock& getTimeStamp() const {
+        return const_cast<elapsdClock&>(timestamp);
+    }
 
 	inline void startAllTimers() {
 		timestamp.takeStartStamp();

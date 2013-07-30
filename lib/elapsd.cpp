@@ -178,7 +178,9 @@ double elapsd::convTimeSpecToDoubleSeconds(const struct timespec &t) {
     return tt;
 }
 
-void elapsd::addKernelDataVolumes(int KernelID, int DeviceID, int64_t inBytes, int64_t outBytes) {
+void elapsd::addKernelDataVolumes(
+    int KernelID, int DeviceID, int64_t inBytes, int64_t outBytes
+) {
     
     t_elapsd_id elapsd_id = getElapsdID(
         (uint32_t)(getThreadID() - getThreadGroupID()),
