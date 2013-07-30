@@ -26,7 +26,7 @@ OBJ_THR		= $(TARGET_THREADS).o
 OBJ_C		= c_example.o
 OBJ_F90		= f_example.o
 
-all: $(TARGET_CPP) $(TARGET_C) $(TARGET_F90) $(TARGET_MDEV) $(TARGET_THREADS)
+all: pre_build $(TARGET_CPP) $(TARGET_C) $(TARGET_F90) $(TARGET_MDEV) $(TARGET_THREADS)
 
 $(TARGET_CPP) : $(OBJ_CPP)
 	$(CXX) $(LDFLAGS) $(OBJ_CPP) -o $(TARGET_CPP) $(LLIB) 
@@ -45,3 +45,7 @@ $(TARGET_F90) : $(OBJ_F90)
 
 clean:
 	rm -f $(TARGET_CPP) $(TARGET_C) $(OBJ_CPP) $(OBJ_C) $(TARGET_F90) $(OBJ_F90) $(TARGET_MDEV) $(OBJ_MDEV) $(TARGET_THREADS) $(OBJ_THR)
+
+.PHONY: pre_build
+pre_build:
+	@echo -e "\n $(Y_COLOR)### Building examples.$(NO_COLOR)\n"

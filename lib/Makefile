@@ -1,6 +1,6 @@
 include ../Makefile.include
 
-SUBDIRS		= elapsd
+SUBDIRS		= elapsd predict
 CLEANDIRS	= $(SUBDIRS:%=clean-%)
 BUILDDIRS	= $(SUBDIRS:%=build-%)
 

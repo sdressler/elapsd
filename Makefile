@@ -5,6 +5,7 @@ CLEANDIRS	= $(SUBDIRS:%=clean-%)
 BUILDDIRS	= $(SUBDIRS:%=build-%)
 
 all: $(BUILDDIRS)
+	@echo -e "\n $(Y_COLOR)### All done.$(NO_COLOR)\n"
 
 $(DIRS): $(BUILDDIRS)
 

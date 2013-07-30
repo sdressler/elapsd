@@ -25,8 +25,13 @@ endif
 
 INC = $(wildcard ../../include/elapsd/*.h)
 
-all: $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
+all: pre_build $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
 	$(CXX) $(LDFLAGS) $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) -o $(TARGET_DIR)lib$(TARGET).so $(LLIB)
 
 clean:
 	rm -f $(TARGET_DIR)lib$(TARGET).so $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) ../../include/elapsd/m_elapsd.mod
+
+.PHONY: pre_build
+pre_build:
+	@echo -e "\n $(Y_COLOR)### Building $(TARGET).$(NO_COLOR)\n"
+

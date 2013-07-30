@@ -46,3 +46,4 @@ Y_COLOR=\x1b[33;01m
 %.o : %.F90
 	@echo -e " $(G_COLOR)[ F90 ]$(NO_COLOR) : $< -> $@"
 	@$(FC) $(FFLAGS) -c $<
+
