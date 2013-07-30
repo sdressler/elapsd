@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 
+#include "SQLite.h"
+
 namespace ENHANCE {
 
 /**
@@ -19,8 +21,9 @@ namespace ENHANCE {
  * \copyright BSD License
  *
  * */
-class elapsdParams : public std::map<std::string, int> { };
+class elapsdParams : public std::map<std::string, int> {
 
+};
 }
 
 #else

@@ -2,7 +2,7 @@
 #include "../include/elapsd/Params.h"
 
 elapsdParams* elapsdParamsInit() {
-    return cpp_callback_elapsdParams();
+    return cpp_callback_elapsdParamsInit();
 }
 
 int elapsdParamsAddParam(elapsdParams *p, const char *key, int value) {

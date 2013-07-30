@@ -26,15 +26,6 @@ OBJ_THR		= $(TARGET_THREADS).o
 OBJ_C		= c_example.o
 OBJ_F90		= f_example.o
 
-%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c -fopenmp $<
-
-%.o : %.c
-	$(CC) $(CXXFLAGS) -c $<
-
-%.o : %.F90
-	$(FC) $(FFLAGS) -c $<
-
 all: $(TARGET_CPP) $(TARGET_C) $(TARGET_F90) $(TARGET_MDEV) $(TARGET_THREADS)
 
 $(TARGET_CPP) : $(OBJ_CPP)

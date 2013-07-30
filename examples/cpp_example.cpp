@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <map>
+#include <string>
 
 using namespace ENHANCE;
 using namespace std;
@@ -16,23 +18,28 @@ unsigned int fib(unsigned int n) {
 
 int main(void) {
 
-    elapsd e("elapsd.db", "Fibonacci C++");
-
-    cout << "Adding kernel.\n";
-    e.addKernel(0, "Fibonacci");
-    e.addKernel(1, "Dummy");
-    
-    cout << "Adding device\n";
-    e.addDevice(0, "CPU");
-
-    cout << "Generating timings and datavolumes\n";
+    elapsdParams params;
 
     unsigned int f;
     unsigned int f_src;
+
     for (int i = 0; i < 4; i++) {
 
         // Fib number to generate
         f_src = (i + 1) * 10;
+
+        params["FIB"] = f_src;
+
+        elapsd e("elapsd.db", "Fibonacci C++", params);
+
+        cout << "Adding kernel.\n";
+        e.addKernel(0, "Fibonacci");
+        e.addKernel(1, "Dummy");
+        
+        cout << "Adding device\n";
+        e.addDevice(0, "CPU");
+
+        cout << "Generating timings and datavolumes\n";
 
         // Start Timer
         e.startTimer(0, 0);
@@ -48,14 +55,14 @@ int main(void) {
         e.addKernelDataVolumes(0, 0, 4, 4);
 
         cout << "Fibonacci " << f_src << ": " << f << "\n";
+
+        cout << "Printing content:\n";
+        cout << e;
+
+        cout << "Committing to DB\n";
+        e.commitToDB();
+
     }
-
-
-    cout << "Printing content:\n";
-    cout << e;
-
-    cout << "Committing to DB\n";
-    e.commitToDB();
 
     return 0;
 
