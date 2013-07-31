@@ -1,6 +1,6 @@
 include Makefile.include
 
-SUBDIRS		= examples lib
+SUBDIRS		= examples lib test
 CLEANDIRS	= $(SUBDIRS:%=clean-%)
 BUILDDIRS	= $(SUBDIRS:%=build-%)
 
@@ -18,6 +18,9 @@ build-examples: build-lib
 lib: 
 	$(MAKE) -C lib
 
+test:
+	$(MAKE) -C test
+
 doc:
 	$(MAKE) -C doc
 
@@ -27,12 +30,16 @@ examples:
 run: $(BUILDDIRS)
 	LD_LIBRARY_PATH=lib/ examples/cpp_example
 
+run_test: $(BUILDDIRS)
+	$(MAKE) -C test run
+
 clean:
 	$(MAKE) -C lib clean
+	$(MAKE) -C test clean
 	$(MAKE) -C doc clean
 	$(MAKE) -C examples clean
 	rm -f include/elapsd/*.mod
 
 .PHONY: subdirs $(SUBDIRS)
-.PHONY: all lib examples clean
+.PHONY: all lib test examples clean
 
