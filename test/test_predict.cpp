@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE elapsd_predict test
 #define BOOST_TEST_DYN_LINK
+
 #include <boost/test/unit_test.hpp>
 
 #include <elapsd/predict/predict.h>
@@ -51,6 +51,30 @@ BOOST_AUTO_TEST_CASE(distinct_measurements_test) {
     );
 
     BOOST_CHECK_EQUAL(p->getNumberOfDistinctMeasurements(), 4);
+
+    delete p;
+
+}
+
+BOOST_AUTO_TEST_CASE(prediction_test) {
+
+    ENHANCE::elapsdParams params;
+    params.insert(std::make_pair("FIB", 50));
+
+    ENHANCE::predict *p = NULL;
+
+    BOOST_REQUIRE_NO_THROW(
+        p = new ENHANCE::predict("test.db", params);
+    );
+
+    BOOST_REQUIRE_NO_THROW(p->generateLagrangePolynomial());
+
+    double runtime = 0.0;
+
+    BOOST_REQUIRE_NO_THROW(runtime = p->makeRuntimePrediction(50));
+
+    BOOST_CHECK(runtime < 0.56);
+    BOOST_CHECK(runtime > 0.54);
 
     delete p;
 

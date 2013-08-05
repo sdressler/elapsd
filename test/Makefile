@@ -1,30 +1,31 @@
 include ../Makefile.include
 
-TESTS        = lagrange predict sqlite
+TARGET       = elapsd_test_suite
 
 ################
 # DO NOT TOUCH #
 ################
 
-TARGETS      = $(addprefix test_, $(TESTS))
-TARGETS_RUN  = $(TARGETS:%=%-run)
+TARGETS_SRC  = $(wildcard *.cpp) 
+TARGETS_OBJ  = $(TARGETS_SRC:%.cpp=%.o)
 
 CXXFLAGS	+= -I../include
 LDFLAGS      = -L../lib -lelapsd -lelapsd_predict \
 			   -lboost_unit_test_framework \
-			   -lsqlite3
+			   -lsqlite3 \
+               $(if $(DEBUG),-fopenmp,)
 
-all: $(TARGETS)
+all: $(TARGET)
 
-$(TARGETS): $(addsuffix .cpp, $(TARGETS))
-	$(CXX) $(CXXFLAGS) -o $@ $(addsuffix .cpp, $@) $(LDFLAGS)
+$(TARGET): $(TARGETS_OBJ)
+	$(CXX) -o $@ $(TARGETS_OBJ) $(LDFLAGS)
 
-run: $(TARGETS_RUN)
-
-$(TARGETS_RUN): $(TARGETS)
-	LD_LIBRARY_PATH=../lib ./$(@:%-run=%) --show_progress=yes
+run: $(TARGET)
+	LD_LIBRARY_PATH=../lib ./$(TARGET) --show_progress=yes --report_level=detailed
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS_OBJ) $(TARGET)
 
-.PHONY: TARGETS_RUN TARGETS
+.PHONY: pre_build
+pre_build:
+	@echo -e "\n $(Y_COLOR)### Building tests.$(NO_COLOR)\n"

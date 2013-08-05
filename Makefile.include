@@ -12,7 +12,7 @@ WITH_FAPI = NO
 MAX_UNITS = 1024
 
 # Change to "YES" to enable DEBUG mode, NORMAL when empty
-DEBUG =
+DEBUG = YES
 
 
 ### DO NOT TOUCH ###

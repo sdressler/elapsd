@@ -14,6 +14,7 @@ $(BUILDDIRS):
 
 # Build examples only after lib
 build-examples: build-lib
+build-test: build-lib build-examples
 
 lib: 
 	$(MAKE) -C lib

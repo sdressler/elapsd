@@ -89,7 +89,7 @@ bool predict::checkMatchingParamsInDB() {
 
 }
 
-int predict::getNumberOfDistinctMeasurements() {
+int predict::getNumberOfDistinctMeasurements() const {
     
     /*
      * IMPORTANT NOTE: this routine currently only works under the assumption,
@@ -115,3 +115,56 @@ int predict::getNumberOfDistinctMeasurements() {
     return sqlite3_column_int(stmt.get(), 0);
 
 }
+
+void predict::generateLagrangePolynomial() {
+
+    if (getNumberOfDistinctMeasurements() < 3) {
+        throw std::runtime_error("Not enough measurements!");
+    }
+
+    typedef Lagrange<3, int, double>::Point Point;
+
+    /* Load all available X/Y Points */
+    std::string qry(
+        "SELECT param_value, avg((ts_stop - ts_start) * 1.0e-9) \
+         FROM data \
+         NATURAL JOIN experiment_parameters \
+         GROUP BY param_value;"
+    );
+
+    boost::shared_ptr<sqlite3_stmt> stmt;
+    SQLiteQuery(db_, qry, stmt);
+
+    std::vector<Point> points;
+
+    int ret = sqlite3_step(stmt.get());
+    while (ret == SQLITE_ROW) {
+    
+        int X = sqlite3_column_int(stmt.get(), 0);
+        double Y = sqlite3_column_double(stmt.get(), 1);
+
+        points.push_back(std::make_pair(X, Y));
+
+        ret = sqlite3_step(stmt.get());
+    }
+
+    if (ret != SQLITE_DONE) {
+        std::stringstream err;
+        err << "SQLITE_DONE expected, got " << ret;
+        throw std::runtime_error(err.str());
+    }
+
+    L = Lagrange<3, int, double>(points);
+    L.findBestPolynomial();
+
+}
+
+double predict::makeRuntimePrediction(const int N) const {
+
+    double runtime = L.getLagrangeInterpolation(N);
+
+    DMSG("Predicted runtime: " << runtime << " s");
+
+    return runtime;
+}
+

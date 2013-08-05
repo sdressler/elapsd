@@ -10,6 +10,8 @@ clean: $(CLEANDIRS)
 
 $(DIRS): $(BUILDDIRS)
 
+build-predict: build-elapsd
+
 $(BUILDDIRS):
 	$(MAKE) -C $(@:build-%=%)
 

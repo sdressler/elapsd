@@ -2,6 +2,7 @@
 #define PREDICT_H_INC_
 
 #include <elapsd/Params.h>
+#include <elapsd/predict/Lagrange.h>
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -18,6 +19,8 @@ class predict {
 private:
     boost::shared_ptr<sqlite3> db_;
     elapsdParams parameters_;
+
+    Lagrange<3, int, double> L;
 
     /**
      * This routine checks, whether the provided parameters match those from the
@@ -41,7 +44,11 @@ public:
      * pairs in the DB. For a prediction, we need at least three (3)
      * measurements.
      * */
-    int getNumberOfDistinctMeasurements();
+    int getNumberOfDistinctMeasurements() const;
+
+    void generateLagrangePolynomial();
+
+    double makeRuntimePrediction(const int N) const;
 
 };
 
