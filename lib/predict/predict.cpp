@@ -9,7 +9,9 @@ using namespace ENHANCE;
 
 predict::predict(
     const std::string &dbname,
-    const elapsdParams &parameters
+    const std::vector<std::string> &parameters,
+    const int KernelID,
+    const int DeviceID
 ) {
 
     /*
@@ -34,19 +36,22 @@ predict::predict(
     /*
      * Ensure, that the parameter set is non-empty and copy its contents.
      * */
-    if (parameters.empty()) { throw std::runtime_error("Parameter map empty."); }
+    if (parameters.empty()) { throw std::runtime_error("No parameters given."); }
 
     /* Current limitation: only one parameter */
     if (parameters.size() > 1) {
-        throw std::runtime_error("Only one parameter is currently supported");
+        throw std::runtime_error("Currently, only one parameter is supported");
     }
 
-    parameters_.insert(parameters.begin(), parameters.end());
+    parameters_ = parameters;
 
     /* Parameter validation */
     if(!checkMatchingParamsInDB()) {
         throw std::runtime_error("Parameters do not match with DB.");
     }
+
+    KernelID_ = KernelID;
+    DeviceID_ = DeviceID;
 
 }
 
@@ -67,14 +72,18 @@ bool predict::checkMatchingParamsInDB() {
     boost::shared_ptr<sqlite3_stmt> stmt;
     SQLiteQuery(db_, qry, stmt);
 
-    elapsdParams pcopy(parameters_);
+    std::vector<std::string> pcopy(parameters_);
 
     int ret = sqlite3_step(stmt.get());
     while (ret == SQLITE_ROW) {
     
         const char *pname = (const char*)sqlite3_column_text(stmt.get(), 0);
 
-        if (pcopy.find(pname) != pcopy.end()) { pcopy.erase(pname); }
+        std::vector<std::string>::iterator it = std::find(
+            pcopy.begin(), pcopy.end(), std::string(pname)      
+        );
+
+        if (it != pcopy.end()) { pcopy.erase(it); }
 
         ret = sqlite3_step(stmt.get());
     }
@@ -97,12 +106,15 @@ int predict::getNumberOfDistinctMeasurements() const {
      * constructor.
      * */
 
-    std::string qry(
-        "SELECT COUNT(DISTINCT param_value) FROM experiment_parameters"
-    );
+    std::stringstream ss;
+
+    ss << "SELECT COUNT(DISTINCT param_value) "
+       << "FROM experiment_parameters "
+       << "NATURAL JOIN data "
+       << "WHERE id_kernel = " << KernelID_ << " AND id_device = " << DeviceID_;
 
     boost::shared_ptr<sqlite3_stmt> stmt;
-    SQLiteQuery(db_, qry, stmt);
+    SQLiteQuery(db_, ss.str(), stmt);
 
     int ret = sqlite3_step(stmt.get());
 

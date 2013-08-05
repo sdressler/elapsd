@@ -18,7 +18,10 @@ class predict {
     
 private:
     boost::shared_ptr<sqlite3> db_;
-    elapsdParams parameters_;
+    std::vector<std::string> parameters_;
+
+    int KernelID_;
+    int DeviceID_;
 
     Lagrange<3, int, double> L;
 
@@ -34,9 +37,11 @@ public:
      * This replaces the default constructor, because we really need a DB which
      * is opened during object construction
      * */
-    explicit predict(
+    predict(
         const std::string &dbname,
-        const elapsdParams &parameters
+        const std::vector<std::string> &parameters,
+        const int KernelID = 0,
+        const int DeviceID = 0
     );
     
     /**
@@ -46,8 +51,14 @@ public:
      * */
     int getNumberOfDistinctMeasurements() const;
 
+    /**
+     * This routine generates the lagrange polynomial.
+     * */
     void generateLagrangePolynomial();
 
+    /**
+     * This routine generates a runtime prediction for a given N
+     * */
     double makeRuntimePrediction(const int N) const;
 
 };

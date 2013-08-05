@@ -8,7 +8,7 @@
 
 BOOST_AUTO_TEST_CASE(constructors_test) {
 
-    ENHANCE::elapsdParams params;
+    std::vector<std::string> params;
 
     BOOST_CHECK_THROW(
         ENHANCE::predict p("", params),
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(constructors_test) {
     );
 
     /* Populate list with *wrong* parameters */
-    params.insert(std::make_pair("FAIL", 1));
+    params.push_back("FAIL");
     BOOST_CHECK_THROW(
         ENHANCE::predict p("test.db", params),
         std::runtime_error
@@ -34,15 +34,15 @@ BOOST_AUTO_TEST_CASE(constructors_test) {
 
     /* Re-populate with correct parameters */
     params.clear();
-    params.insert(std::make_pair("FIB", 1));
+    params.push_back("FIB");
     BOOST_CHECK_NO_THROW(ENHANCE::predict p("test.db", params));
 
 }
 
 BOOST_AUTO_TEST_CASE(distinct_measurements_test) {
 
-    ENHANCE::elapsdParams params;
-    params.insert(std::make_pair("FIB", 1));
+    std::vector<std::string> params;
+    params.push_back("FIB");
 
     ENHANCE::predict *p = NULL;
 
@@ -51,6 +51,14 @@ BOOST_AUTO_TEST_CASE(distinct_measurements_test) {
     );
 
     BOOST_CHECK_EQUAL(p->getNumberOfDistinctMeasurements(), 4);
+    
+    delete p;
+
+    BOOST_REQUIRE_NO_THROW(
+        p = new ENHANCE::predict("test.db", params, 1, 1)
+    );
+
+    BOOST_CHECK_EQUAL(p->getNumberOfDistinctMeasurements(), 0);
 
     delete p;
 
@@ -58,8 +66,8 @@ BOOST_AUTO_TEST_CASE(distinct_measurements_test) {
 
 BOOST_AUTO_TEST_CASE(prediction_test) {
 
-    ENHANCE::elapsdParams params;
-    params.insert(std::make_pair("FIB", 50));
+    std::vector<std::string> params;
+    params.push_back("FIB");
 
     ENHANCE::predict *p = NULL;
 
