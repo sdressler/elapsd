@@ -18,7 +18,7 @@ else
 endif
 
 ifeq ($(WITH_FAPI), YES)
-    OBJ_FAPI = F.o
+    OBJ_FAPI = Felapsd.o Fparams.o
 else
     OBJ_FAPI =
 endif

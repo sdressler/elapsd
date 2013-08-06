@@ -1,6 +1,6 @@
 MODULE m_elapsd
 !
-! #include "../include/elapsd/celapsd.h"
+! #include "../../include/elapsd/celapsd.h"
 !
     IMPLICIT NONE
 
@@ -102,16 +102,16 @@ MODULE m_elapsd
             INTEGER(C_INT) :: elapsdAddKernelDataVolumes
         END FUNCTION elapsdAddKernelDataVolumes
 
-        FUNCTION elapsdInsertKernelConfPair(c, cKey, cValue) &
-&           BIND(C, NAME="elapsdInsertKernelConfPair")
+        FUNCTION elapsdGetLastWallTime(e, KernelID, DeviceID) &
+&           BIND(C, NAME="elapsdGetLastWallTime")
 
-            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_CHAR
+            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_DOUBLE
             IMPLICIT NONE
-            TYPE(C_PTR), VALUE :: c
-            CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: cKey
-            CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: cValue
-            INTEGER(C_INT) :: elapsdInsertKernelConfPair
-        END FUNCTION elapsdInsertKernelConfPair
+            TYPE(C_PTR), VALUE :: e
+            INTEGER(C_INT), VALUE :: KernelID
+            INTEGER(C_INT), VALUE :: DeviceID
+            REAL(C_DOUBLE) :: elapsdGetLastWallTime
+        END FUNCTION elapsdGetLastWallTime
 
         SUBROUTINE elapsdCommitToDB(e) &
 &           BIND(C, NAME="elapsdCommitToDB")

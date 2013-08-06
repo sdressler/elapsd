@@ -99,6 +99,10 @@ int cpp_callback_elapsdStopTimer(elapsd *e, int KernelID, int DeviceID) {
 	return E_OK;
 }
 
+double cpp_callback_elapsdGetLastWallTime(elapsd *e, int KernelID, int DeviceID) {
+    return e->getLastWallTime(KernelID, DeviceID);
+}
+
 int cpp_callback_elapsdAddKernelDataVolumes(elapsd *e, int KernelID, int DeviceID, int64_t inBytes, int64_t outBytes) {
 	try {
 		e->addKernelDataVolumes(KernelID, DeviceID, inBytes, outBytes);

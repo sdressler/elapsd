@@ -140,6 +140,9 @@ void cpp_callback_elapsdPrintResults(elapsd *e);
 void elapsdCommitToDB(elapsd *e);
 void cpp_callback_elapsdCommitToDB(elapsd *e);
 
+double elapsdGetLastWallTime(elapsd *e, int KernelID, int DeviceID);
+double cpp_callback_elapsdGetLastWallTime(elapsd *e, int KernelID, int DeviceID);
+
 #ifdef __cplusplus
 }
 #endif
