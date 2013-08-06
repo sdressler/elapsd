@@ -170,14 +170,6 @@ void elapsd::addSubDeviceToDevice(const int ID, const int sID) {
     (it->second).addSubDevice(sID);
 }
 
-// Take a TimeSpec structure and convert it to double, seconds
-double elapsd::convTimeSpecToDoubleSeconds(const struct timespec &t) {
-    double tt = (double)t.tv_nsec * 1.0e-9;
-    tt += (double)t.tv_sec;
-
-    return tt;
-}
-
 void elapsd::addKernelDataVolumes(
     int KernelID, int DeviceID, int64_t inBytes, int64_t outBytes
 ) {

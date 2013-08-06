@@ -137,15 +137,19 @@ void predict::generateLagrangePolynomial() {
     typedef Lagrange<3, int, double>::Point Point;
 
     /* Load all available X/Y Points */
-    std::string qry(
-        "SELECT param_value, avg((ts_stop - ts_start) * 1.0e-9) \
-         FROM data \
-         NATURAL JOIN experiment_parameters \
-         GROUP BY param_value;"
-    );
+    std::stringstream ss;
+
+    ss << "SELECT param_value, avg((ts_stop - ts_start) * 1.0e-9) "
+       << "FROM data "
+       << "NATURAL JOIN experiment_parameters "
+       << "WHERE id_kernel = " << KernelID_ << " "
+       <<   "AND id_device = " << DeviceID_ << " "
+       << "GROUP BY param_value";
+
+    DMSG(ss.str());
 
     boost::shared_ptr<sqlite3_stmt> stmt;
-    SQLiteQuery(db_, qry, stmt);
+    SQLiteQuery(db_, ss.str(), stmt);
 
     std::vector<Point> points;
 
