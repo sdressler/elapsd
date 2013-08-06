@@ -13,13 +13,9 @@ predict* cpp_callback_predictInit(
     predict *p_;
 
     try {
-    
         p_ = new predict(std::string(db), p->getKeys(), KernelID, DeviceID);
-
     } catch (...) {
-
         return NULL;
-
     }
 
     return p_;
@@ -35,7 +31,7 @@ int cpp_callback_predictGenerateLagrangePolynomial(predict *p) {
     try {
         p->generateLagrangePolynomial();
     } catch (...) {
-        return E_NOK; //TODO: THIS NEEDS TO BE CHANGED!!!
+        return E_LAGR;
     }
 
     return E_OK;

@@ -18,7 +18,7 @@ else
 endif
 
 ifeq ($(WITH_FAPI), YES)
-    OBJ_FAPI = 
+    OBJ_FAPI = Fpredict.o
 else
     OBJ_FAPI =
 endif

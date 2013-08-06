@@ -26,7 +26,8 @@ enum ERR {
 	E_TMR,	///< Timer error
 	E_RES,	///< Error in results
 	E_EQU,	///< Two given ID's are equal
-    E_PMAP  ///< Error with params map 
+    E_PMAP, ///< Error with params map
+    E_LAGR  ///< Error with Lagrange polynomial
 };
 
 #ifdef __cplusplus
