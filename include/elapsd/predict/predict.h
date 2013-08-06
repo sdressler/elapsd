@@ -1,6 +1,8 @@
 #ifndef PREDICT_H_INC_
 #define PREDICT_H_INC_
 
+#ifdef __cplusplus
+
 #include <elapsd/Params.h>
 #include <elapsd/predict/Lagrange.h>
 
@@ -64,5 +66,9 @@ public:
 };
 
 }
+
+#else
+typedef struct predict predict;
+#endif
 
 #endif

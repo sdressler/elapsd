@@ -12,7 +12,7 @@ SRC_LIB      = $(filter-out Callbacks%, $(wildcard *.cpp))
 OBJ_LIB      = $(SRC_LIB:%.cpp=%.o)
 
 ifeq ($(WITH_CAPI), YES)
-    OBJ_CAPI = 
+    OBJ_CAPI = Callbacks.o cpredict.o
 else
     OBJ_CAPI =
 endif
