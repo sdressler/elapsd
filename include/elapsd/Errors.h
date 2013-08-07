@@ -14,6 +14,10 @@
  * */
 
 #ifdef __cplusplus
+
+#include <stdexcept>
+#include <string>
+
 extern "C" {
 #endif
 
@@ -28,6 +32,10 @@ enum ERR {
 	E_EQU,	///< Two given ID's are equal
     E_PMAP, ///< Error with params map
     E_LAGR  ///< Error with Lagrange polynomial
+};
+
+struct param_mismatch_error : public std::runtime_error {
+    param_mismatch_error(const std::string &m) : std::runtime_error(m) { }
 };
 
 #ifdef __cplusplus

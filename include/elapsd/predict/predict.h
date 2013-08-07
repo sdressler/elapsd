@@ -3,12 +3,15 @@
 
 #ifdef __cplusplus
 
+#include <elapsd/sqlite/query.h>
 #include <elapsd/Params.h>
-#include <elapsd/predict/Lagrange.h>
+#include <elapsd/predict/IPredictionModel.h>
 
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <sqlite3.h>
+
+#include <elapsd/Errors.h>
 
 /**
  * This is the main predictor class
@@ -17,22 +20,33 @@
 namespace ENHANCE {
 
 class predict {
-    
+
+public:
+    typedef std::pair<std::vector<int>, float> MultDimPointT;
+    typedef MultDimPointT::first_type  x_type;
+    typedef MultDimPointT::second_type y_type;
+
 private:
     boost::shared_ptr<sqlite3> db_;
+    boost::shared_ptr<IPredictionModel<MultDimPointT> > predictionModel_;
+
     std::vector<std::string> parameters_;
 
     int KernelID_;
     int DeviceID_;
-
-    Lagrange<3, int, double> L;
 
     /**
      * This routine checks, whether the provided parameters match those from the
      * DB. That is, their names are matched against the *experiment_parameters*
      * table of the DB. Exceptions are thrown on mismatches.
      * */
-    bool checkMatchingParamsInDB();
+    bool checkMatchingParamsInDB() const;
+
+    /**
+     * This routine retrieves all necessary parameter points from the DB. That
+     * is, it selects all X/Y values matching the given parameters.
+     * */
+    std::vector<MultDimPointT> getDataPointsFromDB() const;
 
 public:
     /**
@@ -42,27 +56,38 @@ public:
     predict(
         const std::string &dbname,
         const std::vector<std::string> &parameters,
-        const int KernelID = 0,
-        const int DeviceID = 0
+        int KernelID = 0, int DeviceID = 0
     );
+
+    template<class T>
+    void createPredictionModel() {
+
+        /**
+         * First, ensure, that the provided parameters match.
+         * */
+        if (!checkMatchingParamsInDB()) {
+            throw param_mismatch_error("Parameters do not match DB.");
+        }
+
+        /* Create the prediction model */
+        predictionModel_ = boost::shared_ptr<T>(new T());
+
+        /**
+         * Retrieve all points from the DB and provide the to the prediction model.
+         * */
+        predictionModel_->updateDataPoints(getDataPointsFromDB());
+
+    }
+
+    /* This simply delegates the runtime prediction call to the model */
+    y_type getRuntimePrediction(const x_type &x) {
+        return predictionModel_->getRuntimePrediction(x);
+    }
+
+    y_type getRuntimePrediction(const x_type::value_type &x) {
+        return predictionModel_->getRuntimePrediction(x_type(1,x));
+    }
     
-    /**
-     * This routine returns the number of distinct measurements for key/value
-     * pairs in the DB. For a prediction, we need at least three (3)
-     * measurements.
-     * */
-    int getNumberOfDistinctMeasurements() const;
-
-    /**
-     * This routine generates the lagrange polynomial.
-     * */
-    void generateLagrangePolynomial();
-
-    /**
-     * This routine generates a runtime prediction for a given N
-     * */
-    double makeRuntimePrediction(const int N) const;
-
 };
 
 }

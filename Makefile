@@ -1,6 +1,6 @@
 include Makefile.include
 
-SUBDIRS		= examples lib test
+SUBDIRS		= examples lib
 CLEANDIRS	= $(SUBDIRS:%=clean-%)
 BUILDDIRS	= $(SUBDIRS:%=build-%)
 

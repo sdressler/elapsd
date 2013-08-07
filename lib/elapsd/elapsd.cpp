@@ -94,6 +94,8 @@ elapsd::elapsd(
         std::string q_str = q.str();
         q_str.erase(q_str.end() - 2, q_str.end());
 
+        DMSG(q_str);
+
         db.executeInsertQuery(q_str);
 
     }
