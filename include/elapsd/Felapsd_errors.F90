@@ -10,5 +10,5 @@ ENUM, BIND(C)
 &                   E_RES,      & ! Error in results
 &                   E_EQU,      & ! Two ID's were equal
 &                   E_PMAP,     & ! Parameter map error
-&                   E_PRED        ! Prediction error
+&                   E_PNTS        ! Prediction error
 END ENUM

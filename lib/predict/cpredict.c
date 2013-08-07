@@ -10,15 +10,10 @@ predict* predictInit(
     return cpp_callback_predictInit(db, p, KernelID, DeviceID);
 }
 
-int predictGetNumberOfDistinctMeasurements(predict *p) {
-    return cpp_callback_predictGetNumberOfDistinctMeasurements(p);
+int predictCreatePredictionModel_Lagrange(predict *p) {
+    return cpp_callback_predictCreatePredictionModel_Lagrange(p);
 }
 
-int predictGenerateLagrangePolynomial(predict *p) {
-    return cpp_callback_predictGenerateLagrangePolynomial(p);
+float predictGetRuntimePrediction(predict *p, int x) {
+    return cpp_callback_predictGetRuntimePrediction(p, x);
 }
-
-double predictMakeRuntimePrediction(predict *p, int N) {
-    return cpp_callback_predictMakeRuntimePrediction(p, N);
-}
-

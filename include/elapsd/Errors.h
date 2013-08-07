@@ -18,6 +18,10 @@
 #include <stdexcept>
 #include <string>
 
+struct param_mismatch_error : public std::runtime_error {
+    param_mismatch_error(const std::string &m) : std::runtime_error(m) { }
+};
+
 extern "C" {
 #endif
 
@@ -31,11 +35,7 @@ enum ERR {
 	E_RES,	///< Error in results
 	E_EQU,	///< Two given ID's are equal
     E_PMAP, ///< Error with params map
-    E_LAGR  ///< Error with Lagrange polynomial
-};
-
-struct param_mismatch_error : public std::runtime_error {
-    param_mismatch_error(const std::string &m) : std::runtime_error(m) { }
+    E_PNTS  ///< Too few points for prediction
 };
 
 #ifdef __cplusplus

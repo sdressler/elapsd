@@ -18,33 +18,24 @@ INCLUDE "Felapsd_errors.F90"
             TYPE(C_PTR) :: predictInit
         END FUNCTION predictInit
 
-        FUNCTION predictGetNumberOfDistinctMeasurements(p) &
-&           BIND(C, NAME="predictGetNumberOfDistinctMeasurements")
+        FUNCTION predictCreatePredictionModel_Lagrange(p) &
+&           BIND(C, NAME="predictCreatePredictionModel_Lagrange")
 
             USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT
             IMPLICIT NONE
             TYPE(C_PTR), VALUE :: p
-            INTEGER(C_INT) :: predictGetNumberOfDistinctMeasurements
-        END FUNCTION predictGetNumberOfDistinctMeasurements
+            INTEGER(C_INT) :: predictCreatePredictionModel_Lagrange
+        END FUNCTION predictCreatePredictionModel_Lagrange
 
-        FUNCTION predictGenerateLagrangePolynomial(p) &
-&           BIND(C, NAME="predictGenerateLagrangePolynomial")
+        FUNCTION  predictGetRuntimePrediction(p, N) &
+&           BIND(C, NAME="predictGetRuntimePrediction")
 
-            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT
-            IMPLICIT NONE
-            TYPE(C_PTR), VALUE :: p
-            INTEGER(C_INT) :: predictGenerateLagrangePolynomial
-        END FUNCTION predictGenerateLagrangePolynomial
-
-        FUNCTION  predictMakeRuntimePrediction(p, N) &
-&           BIND(C, NAME="predictMakeRuntimePrediction")
-
-            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_DOUBLE
+            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_FLOAT
             IMPLICIT NONE
             TYPE(C_PTR), VALUE :: p
             INTEGER(C_INT), VALUE :: N
-            REAL(C_DOUBLE) :: predictMakeRuntimePrediction
-        END FUNCTION predictMakeRuntimePrediction
+            REAL(C_FLOAT) :: predictGetRuntimePrediction
+        END FUNCTION predictGetRuntimePrediction
     END INTERFACE
 
 END MODULE m_elapsd_predict

@@ -4,6 +4,8 @@
 
 #include <elapsd/Errors.h>
 
+#include <elapsd/predict/LagrangePredictionModel.h>
+
 using namespace ENHANCE;
 
 predict* cpp_callback_predictInit(
@@ -22,23 +24,18 @@ predict* cpp_callback_predictInit(
 
 }
 
-int cpp_callback_predictGetNumberOfDistinctMeasurements(predict *p) {
-    return p->getNumberOfDistinctMeasurements();
-}
-
-int cpp_callback_predictGenerateLagrangePolynomial(predict *p) {
+int cpp_callback_predictCreatePredictionModel_Lagrange(predict *p) {
 
     try {
-        p->generateLagrangePolynomial();
-    } catch (...) {
-        return E_LAGR;
+        p->createPredictionModel<LagrangePredictionModel>();
+    } catch (std::invalid_argument &e) {
+        return E_PNTS;
     }
 
     return E_OK;
 
 }
 
-double cpp_callback_predictMakeRuntimePrediction(predict *p, int N) {
-    return p->makeRuntimePrediction(N);
+float cpp_callback_predictGetRuntimePrediction(predict *p, int x) {
+    return p->getRuntimePrediction(x);
 }
-

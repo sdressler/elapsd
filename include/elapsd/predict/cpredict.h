@@ -13,6 +13,7 @@
 #define C_PREDICT_H_INC_
 
 #include "predict.h"
+
 #include "../cparams.h"
 
 #ifdef __cplusplus
@@ -29,14 +30,11 @@ predict* cpp_callback_predictInit(
     const char *db, const elapsdParams *p, int KernelID, int DeviceID
 );
 
-int predictGetNumberOfDistinctMeasurements(predict *p);
-int cpp_callback_predictGetNumberOfDistinctMeasurements(predict *p);
+int predictCreatePredictionModel_Lagrange(predict *p);
+int cpp_callback_predictCreatePredictionModel_Lagrange(predict *p);
 
-int predictGenerateLagrangePolynomial(predict *p);
-int cpp_callback_predictGenerateLagrangePolynomial(predict *p);
-
-double predictMakeRuntimePrediction(predict *p, int N);
-double cpp_callback_predictMakeRuntimePrediction(predict *p, int N);
+float predictGetRuntimePrediction(predict *p, int x);
+float cpp_callback_predictGetRuntimePrediction(predict *p, int x);
 
 #ifdef __cplusplus
 }
