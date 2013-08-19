@@ -9,9 +9,9 @@ INCLUDE "Felapsd_errors.F90"
         FUNCTION predictInit(db, params, KernelID, DeviceID) &
 &           BIND(C, NAME="predictInit")
 
-            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT
+            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_CHAR
             IMPLICIT NONE
-            TYPE(C_PTR), VALUE :: db
+            CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: db
             TYPE(C_PTR), VALUE :: params
             INTEGER(C_INT), VALUE :: KernelID
             INTEGER(C_INT), VALUE :: DeviceID
