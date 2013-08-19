@@ -17,3 +17,4 @@ int predictCreatePredictionModel_Lagrange(predict *p) {
 float predictGetRuntimePrediction(predict *p, int x) {
     return cpp_callback_predictGetRuntimePrediction(p, x);
 }
+

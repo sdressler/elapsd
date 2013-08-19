@@ -6,13 +6,14 @@ MODULE m_elapsd
 INCLUDE "Felapsd_errors.F90"
 
     INTERFACE
-        FUNCTION elapsdInit(dbFile, expName) &
+        FUNCTION elapsdInit(dbFile, expName, p) &
 &           BIND(C, NAME="elapsdInit")
 
             USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR
             IMPLICIT NONE
             CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: dbFile
             CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: expName
+            TYPE(C_PTR), VALUE :: p
             TYPE(C_PTR) :: elapsdInit
         END FUNCTION elapsdInit
        
