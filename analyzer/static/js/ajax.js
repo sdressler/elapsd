@@ -72,6 +72,8 @@ function createExpSelection(obj) {
 
             exp_to_load = data.result.length;
 
+            console.log(data.result);
+
             $.each(data.result, function(index, value) {
 
                 var exp_id = value[0];
@@ -117,41 +119,3 @@ function createExpSelection(obj) {
     });
 };
 
-function redraw(exp, exp_selection) {
-
-    // Cleanup
-    $('.experiment.container').remove();
-
-    // Draw
-    $.each(exp_selection, function(key,value) {
-        $('<div>', {
-            'class': 'experiment container',
-            'id': 'exp-' + key
-        }).appendTo(exp);
-
-        $('<div>', {
-            'class': 'experiment title',
-            'text': exp_selection[key].exp_date
-        }).appendTo("#exp-" + key);
-
-        $('<div>', {
-            'class': 'experiment title',
-            'text': exp_selection[key].exp_name
-        }).appendTo("#exp-" + key);
-
-        $.each(exp_selection[key].exp_data, function(subkey,value) {
-
-            var kid = subkey.split('-')[0];
-            var did = subkey.split('-')[1];
-
-            $('<div>', {
-                'class': 'experiment selectable',
-                'text': value.kname + " - " + value.dname,
-                'eid': key,
-                'kid': kid,
-                'did': did
-            }).appendTo("#exp-" + key)
-              .click(function(sender) { e.triggerSelect(sender.target); });
-        });
-    });
-}

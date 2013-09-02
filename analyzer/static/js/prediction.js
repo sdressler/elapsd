@@ -232,7 +232,7 @@ function elapsd() {
 
             interp_points = [];
 
-            for (xx = entry.min_x; xx < entry.max_x; xx += 0.1) {
+            for (xx = entry.min_x; xx < entry.max_x; xx += 0.05) {
 
                  interp_points.push({
                      'x': xx,
@@ -240,20 +240,6 @@ function elapsd() {
                  });
 
             }
-
-//            db_data.max_x = entry.length + extend;
-//            db_data.max_y = lagrangePoly(db_data.max_x, line_points);
-//            e.updateScales('both');
-
-            /*
-             *chart
-             *    .append("svg:path")
-             *    .attr("class", "drawings")
-             *    .attr("d", line(line_points))
-             *    .attr("stroke", color_assignments[key])
-             *    .attr("stroke-width", "2pt")
-             *    .attr("fill", "none");
-             */
 
             chart
                 .selectAll("#drawings")
@@ -309,16 +295,16 @@ function elapsd() {
 
         var x_axis = d3.svg.axis()
             .scale(x)
-            .tickFormat(d3.format(".3f"))
+            .tickFormat(d3.format("d"))
 //            .tickSize(-$_chart.innerHeight())
-            .ticks(20)
+//            .ticks(20)
             .orient("bottom");
 
         var y_axis = d3.svg.axis()
             .scale(y)
-            .tickFormat(d3.format(".3f"))
+//            .tickFormat(d3.format(".3f"))
 //            .tickSize(-$_chart.innerWidth())
-            .ticks(20)
+//            .ticks(20)
             .orient("left");
 
         chart.append("g")
@@ -355,3 +341,54 @@ function lagrangePoly(x, points) {
     return y;
 
 }
+
+function createExpSelection(obj) {
+   
+    obj.exp_selection = {}; // Re-Initialize experiments object
+
+    var exp           = experiments;
+    var exp_selection = obj.exp_selection;
+
+    var exp_to_load   = 0;
+    var exp_loaded    = 0;
+
+    $.ajax({
+        type: 'GET',
+        url: '/get_prediction_experiments',
+        dataType: 'json',
+        data: { db: obj.db },
+        async: true,
+        success: function(data) {
+
+            console.log(data);
+
+            var exp_id = 0;
+
+            for (i = 0; i < data.result.length; i++) {
+
+                exp_selection[i] = {
+                    'exp_date'  : '',
+                    'exp_name'  : '',
+                    'exp_start' : '',
+                    'exp_stop'  : '',
+                    'exp_data'  : {}
+                }
+                
+                value = data.result[i];
+                
+                exp_selection[i].exp_data[value[0] + '-' + value[2]] = {
+                    'kname': value[1],
+                    'dname': value[3],
+                    'selected': false
+                };
+            
+            }
+
+            redraw(exp, exp_selection);
+            resizeDocument(e);
+
+            overlayToggle('hide');
+
+        }
+    });
+};

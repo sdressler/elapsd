@@ -52,6 +52,18 @@ def get_experiments():
     
     return jsonify(result=db.db_query_experiments())
 
+@app.route('/get_prediction_experiments')
+def get_prediction_experiments():
+    path = os.path.dirname(os.path.realpath(__file__))
+    db_name = path + '/static/db/' + request.args.get('db', "", type=str)
+    
+    app.jinja_env.globals['db'] = db_name
+    
+    db = db_query.db_query(db_name)
+    
+    return jsonify(result=db.db_query_prediction_experiments())
+
+
 @app.route('/get_experiment_overview')
 def get_experiment_overview():
     db_name = app.jinja_env.globals['db']

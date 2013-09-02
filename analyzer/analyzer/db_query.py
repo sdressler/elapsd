@@ -28,6 +28,14 @@ class db_query:
             JOIN kernels ON id_kernel = kernels.id \
             JOIN devices ON id_device = devices.id \
             WHERE id_experiment = '" + e_id + "'")
+
+    def db_query_prediction_experiments(self):
+        return self.db_query(" \
+            SELECT DISTINCT id_kernel, kernels.name, id_device, devices.name \
+            FROM data \
+            JOIN kernels on kernels.id = id_kernel \
+            JOIN devices on devices.id = id_device \
+        ")
         
     def db_query_kernels(self):
         return self.db_query_full_table("kernels");
