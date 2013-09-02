@@ -1,0 +1,157 @@
+function redrawFromSelection(obj, url, current_selection) {
+    
+    /* Create the selection */
+    var new_selection = {};
+    $.each(obj.exp_selection, function(ekey,evalue) {
+        $.each(evalue.exp_data, function(dkey,dvalue) {
+            if (dvalue.selected) {
+                new_selection[ekey + "-" + dkey] = true;
+            }
+        });
+    });
+
+    var load_selection = [];
+    $.each(new_selection, function(key,value) {
+
+        if (!(key in current_selection)) {
+            sel_key = key.split('-');
+            load_selection.push([
+                parseInt(sel_key[0], 10),
+                parseInt(sel_key[1], 10),
+                parseInt(sel_key[2], 10)    
+            ]);
+        }
+
+    });
+
+    /* Store the current selection */
+    current_selection = new_selection;
+
+    /* Maybe nothing was selected ?! */
+    if (Object.keys(current_selection).length === 0) {
+        obj.clearPlot();
+        return;
+    }
+
+    /* Nothing to reload, but we should trigger a redraw */
+    if (load_selection.length === 0) {
+        obj.changeDisplay();
+        return;
+    }
+
+    /* Trigger the AJAX request to receive the data */
+    overlayToggle(null, 'Data request pending.');
+    var xhr = $.ajax({
+        type: 'POST',
+        url: url,
+        dataType: 'json',
+        data: { sel: load_selection },
+        async: true,
+        success: obj.redrawFromSelectionCallback
+    });
+
+};
+
+function createExpSelection(obj) {
+    
+    obj.exp_selection = {}; // Re-Initialize experiments object
+
+    var exp           = experiments;
+    var exp_selection = obj.exp_selection;
+
+    var exp_to_load   = 0;
+    var exp_loaded    = 0;
+
+    $.ajax({
+        type: 'GET',
+        url: '/get_experiments',
+        dataType: 'json',
+        data: { db: obj.db },
+        async: true,
+        success: function(data) {
+
+            exp_to_load = data.result.length;
+
+            $.each(data.result, function(index, value) {
+
+                var exp_id = value[0];
+
+                exp_selection[exp_id] = {
+                    'exp_date': new Date(value[1] * 1000),
+                    'exp_name': value[2],
+                    'exp_start': value[3],
+                    'exp_stop': value[4],
+                    'exp_data': {}
+                };
+
+                // Call to get details of experiments
+                $.ajax({
+                    type: 'GET',
+                    url: '/get_experiment_overview',
+                    dataType: 'json',
+                    data: { id: exp_id },
+                    async: true,
+                    success: function(data) {
+                        $.each(data.result, function(index, value) {
+                            exp_selection[exp_id].exp_data[value[0] + '-' + value[2]] = {
+                                'kname': value[1],
+                                'dname': value[3],
+                                'selected': false
+                            };
+                        });
+                        
+                        exp_loaded++;
+
+                        if (exp_loaded == exp_to_load) {
+                            redraw(exp, exp_selection);
+                            resizeDocument(e);
+
+                            overlayToggle('hide');
+
+                        }
+
+                    }
+                });
+            });
+        }
+    });
+};
+
+function redraw(exp, exp_selection) {
+
+    // Cleanup
+    $('.experiment.container').remove();
+
+    // Draw
+    $.each(exp_selection, function(key,value) {
+        $('<div>', {
+            'class': 'experiment container',
+            'id': 'exp-' + key
+        }).appendTo(exp);
+
+        $('<div>', {
+            'class': 'experiment title',
+            'text': exp_selection[key].exp_date
+        }).appendTo("#exp-" + key);
+
+        $('<div>', {
+            'class': 'experiment title',
+            'text': exp_selection[key].exp_name
+        }).appendTo("#exp-" + key);
+
+        $.each(exp_selection[key].exp_data, function(subkey,value) {
+
+            var kid = subkey.split('-')[0];
+            var did = subkey.split('-')[1];
+
+            $('<div>', {
+                'class': 'experiment selectable',
+                'text': value.kname + " - " + value.dname,
+                'eid': key,
+                'kid': kid,
+                'did': did
+            }).appendTo("#exp-" + key)
+              .click(function(sender) { e.triggerSelect(sender.target); });
+        });
+    });
+}

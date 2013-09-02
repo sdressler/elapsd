@@ -95,14 +95,6 @@ class db_query:
                   "id_device = " + selection[2] + " " +
             "ORDER BY y, param_name"
         )
-
-        #s_wall_time = self.db_query(
-            #"SELECT id_experiment, (max(ts_stop) - min(ts_start)) / 1.0e9 " +
-            #"FROM data WHERE" +
-            #" id_kernel = "  + selection[1] +
-            #" AND id_device = "  + selection[2] +
-            #" GROUP BY id_experiment"
-        #)
        
         return [
             str(selection[1]) + "-" + str(selection[2]),
