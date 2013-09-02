@@ -48,7 +48,7 @@ function postLoadScript(db, sender) {
 }
 
 $(window).resize(function() {
-    resizeDocument();
+    resizeDocument(e);
 });
 
 var colors = [
