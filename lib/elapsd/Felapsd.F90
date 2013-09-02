@@ -2,8 +2,7 @@ MODULE m_elapsd
 !
 ! #include "../../include/elapsd/celapsd.h"
 !
-
-INCLUDE "Felapsd_errors.F90"
+!#INCLUDE "Felapsd_errors.F90"
 
     INTERFACE
         FUNCTION elapsdInit(dbFile, expName, p) &

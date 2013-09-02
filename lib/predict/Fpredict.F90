@@ -2,8 +2,7 @@ MODULE m_elapsd_predict
 !
 ! #include "../../include/elapsd/predict/cpredict.h"
 !
-
-INCLUDE "Felapsd_errors.F90"
+!#INCLUDE "Felapsd_errors.F90"
 
     INTERFACE
         FUNCTION predictInit(db, params, KernelID, DeviceID) &

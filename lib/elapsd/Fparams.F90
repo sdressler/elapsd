@@ -1,6 +1,6 @@
 MODULE m_elapsd_params
 
-INCLUDE "Felapsd_errors.F90"
+include "Felapsd_errors.F90"
 
 !
 ! #include "../../include/elapsd/cparams.h"

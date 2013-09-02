@@ -10,6 +10,8 @@ program fibonacci
 
       ! Use the elapsd module
       USE m_elapsd
+      use m_elapsd_params
+      use m_elapsd_predict
       USE, INTRINSIC :: ISO_C_BINDING
 
       implicit none                     ! No implicit declarations
@@ -23,13 +25,15 @@ program fibonacci
       end interface
 
       ! Integer for count
-      TYPE(C_PTR) :: elapsd
+      TYPE(C_PTR) :: elapsd,elapsd_params
       integer :: i, err, fNum,f
       character*256 :: s
-
+      
+      elapsd_params=elapsdParamsInit()
+      err=elapsdParamsAddParam(elapsd_params, "FIB", f)
       ! Call some C
       elapsd = elapsdInit("elapsd.db" // C_NULL_CHAR , &
-      &                 "Fibonacci FORTRAN" // C_NULL_CHAR)
+      &                 "Fibonacci FORTRAN" // C_NULL_CHAR, elapsd_params)
 
       ! Add kernels
       print '(a)', "Adding kernel."
