@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+
+	<meta charset="UTF-8" />
+  	<meta name="google" content="notranslate">
+  	<meta http-equiv="Content-Language" content="en" />
+
+	<title>elaps'd Analyzer</title>
+    
+    <link rel="stylesheet" type="text/css" media="all" href="{{url_for('static', filename='css/style.css')}}" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+	
+</head>
+<body>
+
+    <div id="overlay">
+        <div id="db_selector" class="container">
+            <div id="db_entries">
+            <div class="title">Select the DB you want to work with...</div>
+            {% for db in dbs %}
+                <div class="db_entry selectable" onclick="e.changeDB('{{ db }}', '#db_selector')">{{ db }}</div>
+            {% endfor %}
+            </div>
+        </div>
+        <div id="overlay_msg"></div>
+    </div>
+
+    <div class="section" id="experiments"></div>
+    <div class="clear"></div>
+    <div class="section" id="statistics"></div>
+    <div class="section" id="drawing"></div>
+    <div class="clear"></div>
+    <div class="section" id="footer">
+        <div class="option_set">
+            <span class="wrap">
+                <select id="interpolation">
+                    <option value="basis">B-Spline</option>
+                    <option value="bundle">B-Spline 2</option>
+                    <option value="cardinal">Cardinal Spline</option>
+                    <option value="monotone">Cubic Interpolation</option>
+                    <option value="linear">Line Segments</option>
+                </select>
+            </span>
+            <!--
+               -<span class="wrap">
+               -    <input type="checkbox" id="statistics_check" /><label for="statistics_check">Statistics</label>
+               -</span>
+               -<span class="wrap">
+               -    <label for="thread_interleave">Thread-Interleave:&nbsp;</label>
+               -    <input type="radio" name="thread_interleave" id="tinterleave_false" checked /><label for="tinterleave_false">Off</label>
+               -    <input type="radio" name="thread_interleave" id="tinterleave_true" /><label for="tinterleave_true">On</label>
+               -    <input type="radio" name="thread_interleave" id="tinterleave_line" /><label for="tinterleave_line">Line</label>
+               -</span>
+               -<span class="wrap">
+               -    <input type="checkbox" id="threads_max" /><label for="threads_max">Condense Threads</label>
+               -</span>
+               -<span class="wrap">
+               -    <input type="checkbox" id="bg_light" /><label for="bg_light">Light Chart Background</label>
+               -</span>
+               -->
+        </div>
+    </div>
+    <div class="clear"></div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.1.6/d3.min.js"></script>
+
+    <script type="text/javascript" src="{{url_for('static', filename='js/3rdparty/spin.min.js') }}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/prediction.js') }}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/document.js') }}"></script>
+
+</body>
+</html>
