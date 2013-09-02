@@ -86,13 +86,23 @@ class db_query:
     def db_query_wall_times(self, selection):
 
         # Get the overall minimum / maximum for the selected experiment and kernel / device
+
         s_wall_time = self.db_query(
-            "SELECT id_experiment, (max(ts_stop) - min(ts_start)) / 1.0e9 " +
-            "FROM data WHERE" +
-            " id_kernel = "  + selection[1] +
-            " AND id_device = "  + selection[2] +
-            " GROUP BY id_experiment"
+            "SELECT param_name, param_value, (ts_stop - ts_start) * 1.0e-9 as y " +
+            "FROM data " +
+            "NATURAL JOIN experiment_parameters " +
+            "WHERE id_kernel = " + selection[1] + " AND " +
+                  "id_device = " + selection[2] + " " +
+            "ORDER BY y, param_name"
         )
+
+        #s_wall_time = self.db_query(
+            #"SELECT id_experiment, (max(ts_stop) - min(ts_start)) / 1.0e9 " +
+            #"FROM data WHERE" +
+            #" id_kernel = "  + selection[1] +
+            #" AND id_device = "  + selection[2] +
+            #" GROUP BY id_experiment"
+        #)
        
         return [
             str(selection[1]) + "-" + str(selection[2]),

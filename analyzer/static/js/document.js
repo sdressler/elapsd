@@ -19,7 +19,8 @@ $(document).ready(function() {
         param = value.split('=');
 
         if (param[0] == '_debugmode' && param[1] == 'true') {
-            e.changeDB("GLAT_cuda_sebastian.db", db_selector);
+            //e.changeDB("GLAT_cuda_sebastian.db", db_selector);
+            e.changeDB("elapsd_predict.db", db_selector);
         }
     });
 

@@ -412,28 +412,59 @@ function elapsd() {
                 }
 
                 $.each(values, function(index,value) {
+
                     db_data.data[main_key].push({
-                        'x': value[0],
-                        'y': value[1],
+                        'key' : value[0],
+                        'x'   : value[1],
+                        'y'   : value[2],
                         'enabled': true
                     });
+
                 })
 
-                db_data.max_x = 0;
-                db_data.max_y = 0;
+                max_x = 0;
+                max_y = 0;
 
-                db_data.min_x = Number.MAX_VALUE;
-                db_data.min_y = Number.MAX_VALUE;
+                min_x = Number.MAX_VALUE;
+                min_y = Number.MAX_VALUE;
+
+                $.each(db_data.data[main_key], function(key, entry) {
+
+                    max_y = Math.max(max_y, entry.y);
+                    max_x = Math.max(max_x, entry.x);
+
+                    min_x = Math.min(min_x, entry.x);
+                    min_y = Math.min(min_y, entry.y);
+
+                });
+
+                db_data.data[main_key].max_x = max_x;
+                db_data.data[main_key].min_x = min_x;
+                db_data.data[main_key].max_y = max_y;
+                db_data.data[main_key].min_y = min_y;
+                
+                // Update overall min/max
+                max_x = 0;
+                max_y = 0;
+
+                min_x = Number.MAX_VALUE;
+                min_y = Number.MAX_VALUE;
+
 
                 $.each(db_data.data, function(key, entry) {
-                    $.each(entry, function(index, value) {
-                        db_data.max_y = Math.max(db_data.max_y, value.y);
-                        db_data.max_x = Math.max(db_data.max_x, value.x);
 
-                        db_data.min_x = Math.min(db_data.min_x, value.x);
-                        db_data.min_y = Math.min(db_data.min_y, value.y);
-                    });
+                    max_x = Math.max(max_x, entry.max_x);
+                    max_y = Math.max(max_y, entry.max_y);
+
+                    min_x = Math.min(min_x, entry.min_x);
+                    min_y = Math.min(min_y, entry.min_y);
                 });
+                
+                db_data.max_x = max_x;
+                db_data.max_y = max_y;
+
+                db_data.min_x = min_x;
+                db_data.min_y = min_y;
 
                 e.changeDisplay();
             }
@@ -464,11 +495,14 @@ function elapsd() {
             var extend = 0;
 
             interp_points = [];
-            for (n = 1.0; n < entry.length + extend; n += 0.05) {
+
+            for (xx = entry.min_x; xx < entry.max_x; xx += 0.1) {
+
                  interp_points.push({
-                     'x': n,
-                     'y': lagrangePoly(n, line_points)
+                     'x': xx,
+                     'y': lagrangePoly(xx, line_points)
                  });
+
             }
 
 //            db_data.max_x = entry.length + extend;
