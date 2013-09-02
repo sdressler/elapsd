@@ -53,6 +53,8 @@ function elapsd() {
         'min_y': 0
     };
 
+    this.getDBData = function() { return db_data; }
+
     var color_assignments = {};
 
     this.triggerSelect = function(_caller) {
@@ -86,7 +88,7 @@ function elapsd() {
 
         }
 
-        redrawFromSelection(this, '/get_wall_time', current_selection);
+        current_selection = redrawFromSelection(this, '/get_wall_time', current_selection);
 
     };
 

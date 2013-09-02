@@ -22,21 +22,21 @@ function redrawFromSelection(obj, url, current_selection) {
             ]);
         }
 
+        /* Needed to update current_selection */
+        //current_selection[key] = value;
+
     });
-
-    /* Store the current selection */
-    current_selection = new_selection;
-
+    
     /* Maybe nothing was selected ?! */
-    if (Object.keys(current_selection).length === 0) {
+    if (Object.keys(new_selection).length === 0) {
         obj.clearPlot();
-        return;
+        return new_selection;
     }
 
     /* Nothing to reload, but we should trigger a redraw */
     if (load_selection.length === 0) {
-        obj.changeDisplay();
-        return;
+        changeDisplay(obj, obj.getDBData());
+        return new_selection;
     }
 
     /* Trigger the AJAX request to receive the data */
@@ -49,6 +49,8 @@ function redrawFromSelection(obj, url, current_selection) {
         async: true,
         success: obj.redrawFromSelectionCallback
     });
+
+    return new_selection;
 
 };
 
@@ -71,8 +73,6 @@ function createExpSelection(obj) {
         success: function(data) {
 
             exp_to_load = data.result.length;
-
-            console.log(data.result);
 
             $.each(data.result, function(index, value) {
 

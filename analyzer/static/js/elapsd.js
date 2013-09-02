@@ -7,7 +7,7 @@ function elapsd() {
 
     this.setThreadInterleave = function(interleave) {
         this._threadInterleave = interleave;
-        this.changeDisplay();
+        changeDisplay(e, db_data);
     };
 
     var min_width   = 2;
@@ -121,6 +121,8 @@ function elapsd() {
     var x, y;
     var db_data = {};
 
+    this.getDBData = function() { return db_data; }
+
     this.triggerSelect = function(_caller) {
 
         var caller = $(_caller);
@@ -157,7 +159,7 @@ function elapsd() {
 
         }
 
-        redrawFromSelection(this, '/get_data', current_selection);
+        current_selection = redrawFromSelection(this, '/get_data', current_selection);
 
     };
 
@@ -415,14 +417,14 @@ function elapsd() {
             thread_group.stop  = Math.max(thread_group.start, data[key].stop);
             thread_group.color = e.exp_selection[subkeys[0]]
                                   .exp_data[subkeys[1] + '-' + subkeys[2]].color;
-            
+
             prepared_draw_data.push({
                 'data': data[key],
                 'y_idx': parseInt(y_idx, 10),
                 'group_key': group_key,
                 'color': e.exp_selection[subkeys[0]].exp_data[subkeys[1] + '-' + subkeys[2]].color
             });
-            
+
         });
 
         this._total_num_threads = 0;
@@ -660,6 +662,7 @@ function elapsd() {
                 'group_key': obj.group_key,
                 'color': obj.color
             });
+
         });
         
         this.clearPlot();
@@ -700,6 +703,7 @@ function elapsd() {
                      });
 
         $.each(draw_data, function(idx,value) {
+
             chart.selectAll("drawings")
                  .data(value.data)
                  .enter()
