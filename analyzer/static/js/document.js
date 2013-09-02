@@ -1,6 +1,6 @@
 $(document).ready(function() {
-    e = new elapsd();
-    resizeDocument(e);
+
+    //resizeDocument(new elapsd());
 
     $("#overlay").show();
 
@@ -8,11 +8,6 @@ $(document).ready(function() {
     db_selector
         .css('top', $(window).innerHeight() / 2 - db_selector.outerHeight() / 2)
         .css('left', $(window).innerWidth() / 2 - db_selector.outerWidth() / 2);
-
-    /* Create event handler for thread interleaving */
-    $("input:radio[name=thread_interleave]").change(function(ev) {
-        e.setThreadInterleave(ev.target.id.split('_')[1]);
-    });
 
     url_params = window.location.search.substring(1).split('&');
     $.each(url_params, function(index, value) {
@@ -26,6 +21,31 @@ $(document).ready(function() {
     });
 
 });
+
+function runAnalysis(db, sender) {
+    
+    analysis_mode = $("input:radio[name=analysis_mode]:checked").attr('id');
+   
+    if (analysis_mode == "analysis") {
+        $.getScript('/static/js/elapsd.js', function() { postLoadScript(db, sender); });
+    } else {
+        $.getScript('/static/js/prediction.js', function() { postLoadScript(db, sender); });
+    }
+
+}
+
+function postLoadScript(db, sender) {
+    e = new elapsd();
+    resizeDocument(e);
+
+    /* Create event handler for thread interleaving */
+    $("input:radio[name=thread_interleave]").change(function(ev) {
+        e.setThreadInterleave(ev.target.id.split('_')[1]);
+    });
+    
+    changeDB(e, db, sender);
+
+}
 
 $(window).resize(function() {
     resizeDocument();

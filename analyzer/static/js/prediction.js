@@ -1,5 +1,7 @@
 function elapsd() {
 
+    $(".option_set").hide();
+
     var e = this;
 
     var chart_seconds = d3.select('#drawing').append("svg:svg")
@@ -361,10 +363,6 @@ function createExpSelection(obj) {
         data: { db: obj.db },
         async: true,
         success: function(data) {
-
-            console.log(data);
-
-            var exp_id = 0;
 
             for (i = 0; i < data.result.length; i++) {
 
