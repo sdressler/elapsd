@@ -27,6 +27,10 @@ int elapsdStopTimer(elapsd *e, int KernelID, int DeviceID) {
 	return cpp_callback_elapsdStopTimer(e, KernelID, DeviceID);
 }
 
+double elapsdGetLastWallTime(elapsd *e, int KernelID, int DeviceID) {
+    return cpp_callback_elapsdGetLastWallTime(e, KernelID, DeviceID);
+}
+
 int elapsdAddKernelDataVolumes(elapsd *e, int KernelID, int DeviceID,
                                           int64_t inBytes, int64_t outBytes) {
 

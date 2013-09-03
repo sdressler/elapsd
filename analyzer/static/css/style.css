@@ -181,3 +181,22 @@ dd {
     stroke: #000;
 }
 
+.point-helper {
+    stroke-opacity: 0.0;
+}
+
+.point-helper:hover {
+    stroke-opacity: 1.0;
+    cursor: pointer;
+}
+
+.axes path,
+.axes line {
+    fill: none;
+    stroke: white;
+    shape-rendering: crispEdges;
+}
+
+.axes text {
+    fill: white;
+}

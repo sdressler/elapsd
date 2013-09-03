@@ -1,28 +1,18 @@
 MODULE m_elapsd
 !
-! #include "../include/elapsd/celapsd.h"
+! #include "../../include/elapsd/celapsd.h"
 !
-    IMPLICIT NONE
-
-    ENUM, BIND(C)
-        ENUMERATOR ::   E_OK = 0,   & ! No error, success
-&                       E_DUPK,     & ! Kernel already exists
-&                       E_DUPD,     & ! Device already exists
-&                       E_NOK,      & ! Kernel not found
-&                       E_NOD,      & ! Device not found
-&                       E_TMR,      & ! Timer error
-&                       E_RES,      & ! Error in results
-&                       E_EQU         ! Two ID's were equal
-    END ENUM
+!#INCLUDE "Felapsd_errors.F90"
 
     INTERFACE
-        FUNCTION elapsdInit(dbFile, expName) &
+        FUNCTION elapsdInit(dbFile, expName, p) &
 &           BIND(C, NAME="elapsdInit")
 
             USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_CHAR
             IMPLICIT NONE
             CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: dbFile
             CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: expName
+            TYPE(C_PTR), VALUE :: p
             TYPE(C_PTR) :: elapsdInit
         END FUNCTION elapsdInit
        
@@ -102,16 +92,16 @@ MODULE m_elapsd
             INTEGER(C_INT) :: elapsdAddKernelDataVolumes
         END FUNCTION elapsdAddKernelDataVolumes
 
-        FUNCTION elapsdInsertKernelConfPair(c, cKey, cValue) &
-&           BIND(C, NAME="elapsdInsertKernelConfPair")
+        FUNCTION elapsdGetLastWallTime(e, KernelID, DeviceID) &
+&           BIND(C, NAME="elapsdGetLastWallTime")
 
-            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_CHAR
+            USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_PTR, C_INT, C_DOUBLE
             IMPLICIT NONE
-            TYPE(C_PTR), VALUE :: c
-            CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: cKey
-            CHARACTER(LEN=1, KIND=C_CHAR), DIMENSION(*), INTENT(IN) :: cValue
-            INTEGER(C_INT) :: elapsdInsertKernelConfPair
-        END FUNCTION elapsdInsertKernelConfPair
+            TYPE(C_PTR), VALUE :: e
+            INTEGER(C_INT), VALUE :: KernelID
+            INTEGER(C_INT), VALUE :: DeviceID
+            REAL(C_DOUBLE) :: elapsdGetLastWallTime
+        END FUNCTION elapsdGetLastWallTime
 
         SUBROUTINE elapsdCommitToDB(e) &
 &           BIND(C, NAME="elapsdCommitToDB")

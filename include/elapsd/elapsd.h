@@ -52,8 +52,8 @@ private:
     tDataVector data;
     std::vector<unsigned int> dataSizeVector;
 
-    inline pid_t getThreadID() { return syscall(SYS_gettid); }
-    inline pid_t getThreadGroupID() { return syscall(SYS_getpid); }
+    inline pid_t getThreadID() const { return syscall(SYS_gettid); }
+    inline pid_t getThreadGroupID() const { return syscall(SYS_getpid); }
 
     std::string dbFileName;
     
@@ -62,27 +62,33 @@ private:
     static long int    experiment_date;
 
     typedef uint64_t t_elapsd_id;
-    inline t_elapsd_id getElapsdID(uint32_t t, uint16_t k, uint16_t d) {
+    inline t_elapsd_id getElapsdID(
+        const uint32_t t,
+        const uint16_t k,
+        const uint16_t d
+    ) const {
         return     (uint64_t)t
                + (((uint64_t)k) << 32)
                + (((uint64_t)d) << 48);
     }
 
-    inline uint32_t getElapsdThreadID(t_elapsd_id elapsd_id) {
+    inline uint32_t getElapsdThreadID(const t_elapsd_id elapsd_id) const {
         return (uint32_t)(elapsd_id);
     }
 
-    inline uint16_t getElapsdKernelID(t_elapsd_id elapsd_id) {
+    inline uint16_t getElapsdKernelID(const t_elapsd_id elapsd_id) const {
         return (uint16_t)(elapsd_id >> 32);
     }
     
-    inline uint16_t getElapsdDeviceID(t_elapsd_id elapsd_id) {
+    inline uint16_t getElapsdDeviceID(const t_elapsd_id elapsd_id) const {
         return (uint16_t)(elapsd_id >> 48);
     }
 
 	unsigned long max_units;
-	std::map<t_elapsd_id, uint64_t> thr_map;
 	uint64_t id_relative;
+
+    typedef std::map<t_elapsd_id, uint64_t> thr_map_type;
+    thr_map_type thr_map;
 
 	/**
 	 * Captures the current time and converts it to double
@@ -90,7 +96,7 @@ private:
 	 * @param[in] t Pointer to the timespec variable for saving the result
 	 * @return The time seconds converted to double
 	 * */
-	double convTimeSpecToDoubleSeconds(const struct timespec &t);
+	double convTimeSpecToDoubleSeconds(const struct timespec &t) const;
 
 	/**
 	 * Checks whether a specific device ID exists
@@ -98,7 +104,7 @@ private:
 	 * @exception std::invalid_argument If the device does not exist
 	 * @param[in] ID The ID of the device
 	 * */
-    inline void checkDeviceExistance(const int ID) {
+    inline void checkDeviceExistance(const int ID) const {
         if (devices.find(ID) == devices.end()) {
             throw std::invalid_argument("Device ID not valid.");
         }
@@ -110,7 +116,7 @@ private:
 	 * @exception std::invalid_argument If the kernel does not exist
 	 * @param[in] ID The ID of the kernel
 	 * */
-    inline void checkKernelExistance(const int ID) {
+    inline void checkKernelExistance(const int ID) const {
         if (kernels.find(ID) == kernels.end()) {
             throw std::invalid_argument("Kernel ID not valid.");
         }
@@ -202,6 +208,8 @@ public:
 	 * @param[in] DeviceID The ID of the device
 	 * */
 	void stopTimer(const int KernelID, const int DeviceID);
+
+    double getLastWallTime(const int KernelID, const int DeviceID) const;
 
 	/**
 	 * Registers the data to be transferred for a specific kernel / device combination

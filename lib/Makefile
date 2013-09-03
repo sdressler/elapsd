@@ -1,31 +1,23 @@
 include ../Makefile.include
 
-TARGET		 = elapsd
+SUBDIRS		= elapsd predict
+CLEANDIRS	= $(SUBDIRS:%=clean-%)
+BUILDDIRS	= $(SUBDIRS:%=build-%)
 
-CXXFLAGS	+= -fPIC -I../include
-LDFLAGS		+= -shared
+all: $(BUILDDIRS)
 
-LLIB		+= 
+clean: $(CLEANDIRS)
 
-SRC_LIB      = $(filter-out Callbacks%, $(wildcard *.cpp))
-OBJ_LIB      = $(SRC_LIB:%.cpp=%.o)
+$(DIRS): $(BUILDDIRS)
 
-ifeq ($(WITH_CAPI), YES)
-    OBJ_CAPI = Callbacks.o CallbacksParams.o C.o cparams.o
-else
-    OBJ_CAPI =
-endif
+build-predict: build-elapsd
 
-ifeq ($(WITH_FAPI), YES)
-    OBJ_FAPI = F.o
-else
-    OBJ_FAPI =
-endif
+$(BUILDDIRS):
+	$(MAKE) -C $(@:build-%=%)
 
-INC = $(wildcard ../include/elapsd/*.h)
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
 
-all: $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
-	$(CXX) $(LDFLAGS) $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) -o lib$(TARGET).so $(LLIB)
+.PHONY: subdirs $(SUBDIRS)
+.PHONY: all clean
 
-clean:
-	rm -f lib$(TARGET).so $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) ../include/elapsd/m_elapsd.mod

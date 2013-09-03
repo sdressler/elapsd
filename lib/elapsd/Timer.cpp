@@ -70,4 +70,32 @@ void elapsd::stopTimer(const int KernelID, const int DeviceID) {
 
 }
 
+// Take a TimeSpec structure and convert it to double, seconds
+double elapsd::convTimeSpecToDoubleSeconds(const struct timespec &t) const {
+    double tt = (double)t.tv_nsec * 1.0e-9;
+    tt += (double)t.tv_sec;
+
+    return tt;
+}
+    
+double elapsd::getLastWallTime(const int KernelID, const int DeviceID) const {
+    
+    t_elapsd_id elapsd_id = getElapsdID(
+        (uint32_t)(getThreadID() - getThreadGroupID()),
+        (uint16_t)KernelID,
+        (uint16_t)DeviceID
+    );
+
+    thr_map_type::const_iterator it = thr_map.find(elapsd_id);
+
+    if (it == thr_map.end()) {
+        throw std::runtime_error("Could not find ID in thr_map.");
+    }
+
+    uint64_t id = it->second;
+
+    return (&(data[id].back()))->timestamp.getTimeDifference();
+
+}
+
 }

@@ -72,9 +72,10 @@ private:
             executeInsertQuery(sql);
 
             sql = "CREATE TABLE experiment_parameters ( \
-                    id_experiment INTEGER PRIMARY KEY, \
-                    param_name VARCHAR(255), \
-                    param_value INTEGER \
+                    id_experiment INTEGER NOT NULL, \
+                    param_name TEXT NOT NULL, \
+                    param_value INTEGER, \
+                    PRIMARY KEY(id_experiment, param_name) \
                    )";
 
             executeInsertQuery(sql);

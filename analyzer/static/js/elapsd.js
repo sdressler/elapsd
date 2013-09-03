@@ -2,42 +2,12 @@ function elapsd() {
 
     var e = this;
 
-    var experiments = $('#experiments');
-    var drawing     = $('#drawing');
-    var footer      = $('#footer');
-    var overlay     = $('#overlay');
-
     var bisect_l = d3.bisector(function(d) { return d[0]; }).left;
     var bisect_r = d3.bisector(function(d) { return d[1]; }).right;
 
-    var spinner = new Spinner({
-        color:'#00B1E6',
-        lines: 12,
-        length: 0,
-        width: 8,
-        radius: 14
-    });
-
-    overlayToggle = function(newState, msg) {
-
-        $("#overlay_msg").text(msg);
-        $("#overlay_msg").show();
-
-        if (newState == 'show') {
-            overlay.show();
-            spinner.spin(document.getElementById("overlay"));
-            e._current_overlay_state = 'show';
-        } else if (newState == 'hide') {
-            overlay.fadeOut();
-            spinner.stop();
-            e._current_overlay_state = 'hide';
-        }
-
-    };
-
     this.setThreadInterleave = function(interleave) {
         this._threadInterleave = interleave;
-        this.changeDisplay();
+        changeDisplay(e, db_data);
     };
 
     var min_width   = 2;
@@ -148,196 +118,10 @@ function elapsd() {
 
     var plot_empty = true;
 
-    this.colors = [
-        '#6895E7',
-        '#B468E7',
-        '#7FF26D',
-        '#FFCE73',
-
-        '#27509B',
-        '#6C279B',
-        '#3DAC2B',
-        '#BF8D30',
-
-        '#002F86',
-        '#500087',
-        '#149500',
-        '#A66C00',
-
-        '#3A77E7',
-        '#A13AE7',
-        '#55F23D',
-        '#FFBC40',
-
-        '#0049CE',
-        '#7B00CF',
-        '#1FE600',
-        '#FFA500'
-    ];
-
-    this.resizeDocument = function() {
-
-        var body_height = $("body").height();
-        var body_width  = $("body").width();
-
-        if (typeof this._statistics_width == 'undefined') {
-            this._statistics_width = 0;
-        }
-
-        $("#footer").css('top', body_height - $("#footer").outerHeight());
-        $("#drawing").innerHeight(
-            body_height -
-            $("#footer").outerHeight() -
-            $("#experiments").outerHeight() -
-            parseInt($("#drawing").css('margin-top'),10) -
-            parseInt($("#drawing").css('margin-bottom'),10));
-
-        $("#statistics").innerHeight($("#drawing").innerHeight());
-        $("#statistics").innerWidth(this._statistics_width);
-
-        $("#drawing").innerWidth(
-            body_width - $("#statistics").innerWidth() -
-            parseInt($("#drawing").css('margin-right'),10) -
-            parseInt($("#statistics").css('margin-right'),10));
-
-        $_chart.innerHeight(
-            $("#drawing").innerHeight() -
-            $_chart_seconds.innerHeight() -
-            chart_top_space);
-
-        $("#statistics").innerHeight($_chart.innerHeight());
-        $("#statistics").css('top', $_chart.css('top'));
-
-        $_chart.css('margin-top', chart_top_space);
-        $("#statistics").css('margin-top', chart_top_space + 5);
-
-        // Replace overlay message
-        $("#overlay_msg").css('top', $(window).innerHeight() / 2 + 100).hide();
-
-        // Update scales and replot
-        this.updateScales('both');
-        this.replot();
-
-    };
-
-    this.changeDB = function(db, sender) {
-
-        $(sender).hide();
-
-        overlayToggle('show', 'Switching to ' + db);
-
-        this.db = db;
-
-        // Trigger selection creation
-        this.createExpSelection();
-    };
-
     var x, y;
     var db_data = {};
 
-    this.createExpSelection = function() {
-        
-        this.exp_selection = {}; // Re-Initialize experiments object
-
-        var exp           = experiments;
-        var exp_selection = this.exp_selection;
-
-        var exp_to_load   = 0;
-        var exp_loaded    = 0;
-
-        $.ajax({
-            type: 'GET',
-            url: '/get_experiments',
-            dataType: 'json',
-            data: { db: this.db },
-            async: true,
-            success: function(data) {
-
-                exp_to_load = data.result.length;
-
-                $.each(data.result, function(index, value) {
-
-                    var exp_id = value[0];
-
-                    exp_selection[exp_id] = {
-                        'exp_date': new Date(value[1] * 1000),
-                        'exp_name': value[2],
-                        'exp_start': value[3],
-                        'exp_stop': value[4],
-                        'exp_data': {}
-                    };
-
-                    // Call to get details of experiments
-                    $.ajax({
-                        type: 'GET',
-                        url: '/get_experiment_overview',
-                        dataType: 'json',
-                        data: { id: exp_id },
-                        async: true,
-                        success: function(data) {
-                            $.each(data.result, function(index, value) {
-                                exp_selection[exp_id].exp_data[value[0] + '-' + value[2]] = {
-                                    'kname': value[1],
-                                    'dname': value[3],
-                                    'selected': false
-                                };
-                            });
-                            
-                            exp_loaded++;
-
-                            if (exp_loaded == exp_to_load) {
-                                redrawExperiments(exp, exp_selection);
-                                e.resizeDocument();
-
-                                overlayToggle('hide');
-
-                            }
-
-                        }
-                    });
-                });
-            }
-        });
-    };
-
-    function redrawExperiments(exp, exp_selection) {
-
-        // Cleanup
-        $('.experiment.container').remove();
-
-        // Draw
-        $.each(exp_selection, function(key,value) {
-            $('<div>', {
-                'class': 'experiment container',
-                'id': 'exp-' + key
-            }).appendTo(exp);
-
-            $('<div>', {
-                'class': 'experiment title',
-                'text': exp_selection[key].exp_date
-            }).appendTo("#exp-" + key);
-
-            $('<div>', {
-                'class': 'experiment title',
-                'text': exp_selection[key].exp_name
-            }).appendTo("#exp-" + key);
-
-            $.each(exp_selection[key].exp_data, function(subkey,value) {
-
-                var kid = subkey.split('-')[0];
-                var did = subkey.split('-')[1];
-
-                $('<div>', {
-                    'class': 'experiment selectable',
-                    'text': value.kname + " - " + value.dname,
-                    'eid': key,
-                    'kid': kid,
-                    'did': did
-                }).appendTo("#exp-" + key)
-                  .click(function(sender) { e.triggerSelect(sender.target); });
-            });
-        });
-    }
+    this.getDBData = function() { return db_data; }
 
     this.triggerSelect = function(_caller) {
 
@@ -351,7 +135,7 @@ function elapsd() {
             caller.removeClass('selected');
 
             this.exp_selection[eid].exp_data[sid].selected = false;
-            this.colors.push(this.exp_selection[eid].exp_data[sid].color);
+            colors.push(this.exp_selection[eid].exp_data[sid].color);
 
             xkey = eid + '-' + sid;
             $.each(db_data, function(key,value) {
@@ -368,174 +152,105 @@ function elapsd() {
             caller.addClass('selected');
             this.exp_selection[eid].exp_data[sid].selected = true;
 
-            var color = this.colors.pop();
+            var color = colors.pop();
 
             this.exp_selection[eid].exp_data[sid].color = color;
             caller.css('border-left-color', color);
 
         }
 
-        this.redrawFromSelection();
+        current_selection = redrawFromSelection(this, '/get_data', current_selection);
 
     };
 
-    this.redrawFromSelection = function() {
+    this.redrawFromSelectionCallback = function(data) {
 
-        /* Create the selection */
-        var new_selection = {};
-        $.each(this.exp_selection, function(ekey,evalue) {
-            $.each(evalue.exp_data, function(dkey,dvalue) {
-                if (dvalue.selected) {
-                    new_selection[ekey + "-" + dkey] = true;
-                }
-            });
+        var prefix_key = Object.keys(data.result)[0].split('-');
+            prefix_key = prefix_key[0] + "-" + prefix_key[1] + "-" + prefix_key[2];
+
+        /* Make Thread IDs consecutive in any case */
+        var tids = [];
+        $.each(data.result, function(key,value) {
+            tids.push(parseInt(key.split('-')[3], 10));
         });
 
-        var load_selection = [];
-        $.each(new_selection, function(key,value) {
-
-            if (!(key in current_selection)) {
-                sel_key = key.split('-');
-                load_selection.push([
-                    parseInt(sel_key[0], 10),
-                    parseInt(sel_key[1], 10),
-                    parseInt(sel_key[2], 10)    
-                ]);
-            }
-
+        var suffixes = {};
+        $.each(tids.sort(d3.ascending), function(idx,val) {
+            suffixes[val] = idx;
         });
 
-        /* Store the current selection */
-        current_selection = new_selection;
-
-        /* Maybe nothing was selected ?! */
-        if (Object.keys(current_selection).length === 0) {
-            this.clearPlot();
-            return;
-        }
-
-        /* Nothing to reload, but we should trigger a redraw */
-        if (load_selection.length === 0) {
-            this.changeDisplay();
-            return;
-        }
-
-        /* Trigger the AJAX request to receive the data */
-        overlayToggle(null, 'Data request pending.');
-        var xhr = $.ajax({
-            type: 'POST',
-            url: '/get_data',
-            dataType: 'json',
-            data: { sel: load_selection },
-            async: true,
-            success: function(data) {
-
-                var prefix_key = Object.keys(data.result)[0].split('-');
-                    prefix_key = prefix_key[0] + "-" + prefix_key[1] + "-" + prefix_key[2];
-
-                /* Make Thread IDs consecutive in any case */
-                var tids = [];
-                $.each(data.result, function(key,value) {
-                    tids.push(parseInt(key.split('-')[3], 10));
-                });
-
-                var suffixes = {};
-                $.each(tids.sort(d3.ascending), function(idx,val) {
-                    suffixes[val] = idx;
-                });
-
-                /* Store and rewrite TID if necessary */
-                $.each(data.result, function(key,value) {
-                    var suffix_key = key.split('-')[3];
-                        
-                    var start = d3.min(value.map(function(x) { return x[0]; }));
-                    var stop = d3.max(value.map(function(x) { return x[1]; }));
-
-                    if (suffix_key != suffixes[suffix_key]) {
-                        new_key = prefix_key + "-" + suffixes[suffix_key];
-                        db_data[new_key] = value;
-                        db_data[new_key].start = start;
-                        db_data[new_key].stop = stop;
-                    } else {
-                        db_data[key] = value;
-                        db_data[key].start = start;
-                        db_data[key].stop = stop;
-                    }
-                });
-
-                /* Get maximum */
-                var max = [];
-
-                var max_eid = 0;
-                var max_kid = 0;
-                var max_did = 0;
-                var max_tid = 0;
+        /* Store and rewrite TID if necessary */
+        $.each(data.result, function(key,value) {
+            var suffix_key = key.split('-')[3];
                 
-                $.each(db_data, function(key,value) {
+            var start = d3.min(value.map(function(x) { return x[0]; }));
+            var stop = d3.max(value.map(function(x) { return x[1]; }));
 
-                    subkeys = key.split("-");
-
-                    max_eid = d3.max([max_eid, parseInt(subkeys[0], 10)]);
-                    max_kid = d3.max([max_kid, parseInt(subkeys[1], 10)]);
-                    max_did = d3.max([max_did, parseInt(subkeys[2], 10)]);
-                    max_tid = d3.max([max_tid, parseInt(subkeys[3], 10)]);
-
-                    max.push(d3.max(value.map(function(x) {
-                        return x[1];
-                    })));
-                });
-      
-                var precisions = [
-                    getPrecision(max_eid),
-                    getPrecision(max_kid),
-                    getPrecision(max_did),
-                    getPrecision(max_tid)
-                ];
-
-                $.each(db_data, function(key, value) {
-                   
-                    var subkeys = key.split("-");
-                    var new_key = "";
-
-                    $.each(subkeys, function(index, skey) {
-                        new_key += getPaddedNumString(skey, precisions[index]) + "-";
-                    });
-                    new_key = new_key.slice(0,-1);
-
-
-                    // Exchange keys and add min/max
-                    if (new_key != key) {
-                        db_data[new_key] = db_data[key];
-                        delete db_data[key];
-                    }
-
-                });
-               
-                e.max_value = d3.max(max);
-                e.changeDisplay();
-
+            if (suffix_key != suffixes[suffix_key]) {
+                new_key = prefix_key + "-" + suffixes[suffix_key];
+                db_data[new_key] = value;
+                db_data[new_key].start = start;
+                db_data[new_key].stop = stop;
+            } else {
+                db_data[key] = value;
+                db_data[key].start = start;
+                db_data[key].stop = stop;
             }
         });
 
-    };
+        /* Get maximum */
+        var max = [];
 
-    this.changeDisplay = function() {
-
-        overlayToggle('show', 'Changing View.');
-
-        // Prepare Draw Data
-        e._full_draw_data = e.prepareDrawData(db_data);
-
-        // Update scales
-        e.updateScales('both');
-        e.replot();
-
-        if (this._statistics_width > 0) { this.genStats(); }
+        var max_eid = 0;
+        var max_kid = 0;
+        var max_did = 0;
+        var max_tid = 0;
         
-        overlayToggle('hide');
-    
-    };
-    
+        $.each(db_data, function(key,value) {
+
+            subkeys = key.split("-");
+
+            max_eid = d3.max([max_eid, parseInt(subkeys[0], 10)]);
+            max_kid = d3.max([max_kid, parseInt(subkeys[1], 10)]);
+            max_did = d3.max([max_did, parseInt(subkeys[2], 10)]);
+            max_tid = d3.max([max_tid, parseInt(subkeys[3], 10)]);
+
+            max.push(d3.max(value.map(function(x) {
+                return x[1];
+            })));
+        });
+
+        var precisions = [
+            getPrecision(max_eid),
+            getPrecision(max_kid),
+            getPrecision(max_did),
+            getPrecision(max_tid)
+        ];
+
+        $.each(db_data, function(key, value) {
+           
+            var subkeys = key.split("-");
+            var new_key = "";
+
+            $.each(subkeys, function(index, skey) {
+                new_key += getPaddedNumString(skey, precisions[index]) + "-";
+            });
+            new_key = new_key.slice(0,-1);
+
+
+            // Exchange keys and add min/max
+            if (new_key != key) {
+                db_data[new_key] = db_data[key];
+                delete db_data[key];
+            }
+
+        });
+       
+        e.max_value = d3.max(max);
+        changeDisplay(e, db_data);
+
+    }
+
     this.genStats = function() {    
         d3.selectAll(".stat_text").remove();
         $(".stat_text").remove();
@@ -574,17 +289,6 @@ function elapsd() {
 
         });
     }
-
-    function getPrecision(number) {
-        if (number === 0) { number = 1; }
-        return parseInt(Math.log(number) / Math.LN10 + 1, 10);
-    }
-
-    function getPaddedNumString(strnum,digits) {
-        var pad = digits - strnum.length;
-        return Array(pad + 1).join("0") + strnum;
-    }
-
 
     this.updateScales = function(scale) {
     
@@ -713,14 +417,14 @@ function elapsd() {
             thread_group.stop  = Math.max(thread_group.start, data[key].stop);
             thread_group.color = e.exp_selection[subkeys[0]]
                                   .exp_data[subkeys[1] + '-' + subkeys[2]].color;
-            
+
             prepared_draw_data.push({
                 'data': data[key],
                 'y_idx': parseInt(y_idx, 10),
                 'group_key': group_key,
                 'color': e.exp_selection[subkeys[0]].exp_data[subkeys[1] + '-' + subkeys[2]].color
             });
-            
+
         });
 
         this._total_num_threads = 0;
@@ -841,132 +545,6 @@ function elapsd() {
        
     this._bar_space = 5;
 
-    this.replot = function() {
-
-        // Only if data is available
-        if ($.isEmptyObject(this._full_draw_data)) { return; }   
-
-        var draw_data = [];
-        $.each(this._full_draw_data, function(key,value) {
-
-            var obj = e._full_draw_data[key];
-            var data = obj.data;
-
-            var lo = bisect_l(data, x.domain()[0]) - 1;
-            var hi = bisect_r(data, x.domain()[1]) + 1;
-
-            if (lo == -1) { lo = 0; }
-            if (hi > (data.length - 1)) { hi = data.length; }
-
-            /* This merges elements that are to close to each other */
-            data_array = [[x(data[lo][0]),x(data[lo][1])]];
-            var start, stop;
-            var j = 0;
-            for (var i = lo + 1; i < hi; i++) {
-
-                start = x(data[i][0]);
-                stop  = x(data[i][1]);
-
-                if ((start - data_array[j][1]) < min_width) {
-                    data_array[j][1] = stop;
-                } else {
-                    data_array.push([start,stop]);
-                    j++;
-                }
-            }
-           
-            draw_data.push({
-                'data': data_array,
-                'y_idx': obj.y_idx,
-                'group_key': obj.group_key,
-                'color': obj.color
-            });
-        });
-        
-        this.clearPlot();
-
-        // Draw the grid
-        chart.selectAll("lines")
-             .data(x.ticks(num_ticks))
-             .enter()
-             .append("line")
-             .attr("class", "drawings")
-             .attr("x1", function(d) { return x(d) + 0.5; })
-             .attr("x2", function(d) { return x(d) + 0.5; })
-             .attr("y1", 0)
-             .attr("y2", $_chart.innerHeight())
-             .attr("id", "vgrid")
-             .style("stroke", "#888")
-             .style("stroke-width", "1.5px")
-             .style("stroke-dasharray", "5,5");
-
-        chart_seconds.selectAll(".seconds")
-                     .data(x.ticks(num_ticks))
-                     .enter()
-                     .append("text")
-                     .attr("class", "labels seconds drawings")
-                     .attr("x", x)
-                     .attr("y", $_chart_seconds.height() / 2)
-                     .attr("dy", -3)
-                     .attr("text-anchor", "middle")
-                     .style("fill", function() {
-                         if ($("#bg_light").is(':checked')) {
-                            return "#000"
-                         }
-                         return "#fff"
-                     })
-
-                     .text(function(value) {
-                         return d3.round(value / 1.0e9, 9) + " s";
-                     });
-
-        $.each(draw_data, function(idx,value) {
-            chart.selectAll("drawings")
-                 .data(value.data)
-                 .enter()
-                 .append("rect")
-                 .attr("class", "drawings")
-                 .attr("y", y(value.y_idx))
-                 .attr("x", function(d) { return d[0]; })
-                 .attr("width", function(d) {
-                     w = d[1] - d[0];
-                     if (w < min_width) { return min_width; }
-                     return w;
-                 })
-                 .attr("height", e._bar_height - e._bar_space)
-                 .attr("fill", value.color);
-        });
-
-
-/*
- *                    .on("mousemove", function() {
- *
- *                        var rect_key = d3.event.target.id;
- *                        var key = rect_key.replace("rect-", "");
- *
- *                        var x_pos = $(d3.event.target).position().left;
- *                        var y_pos = parseInt($(d3.event.target).attr("width")) + x_pos;
- *
- *                        $_tag
- *                            .show()
- *                            .css('left', d3.event.pageX)
- *                            .css('top', d3.event.pageY + $_tag.outerHeight())
- *                            .text(
- *                                (x.invert(x_pos - $_chart.position().left) / 1.0e9).toPrecision(e.precision()) + "s " +
- *                                (x.invert(y_pos - $_chart.position().left) / 1.0e9).toPrecision(e.precision()) + "s " +
- *                                db_data[key].length
- *                            );
- *
- *                    })
- *                    .on("mouseout", function() {
- *                        $_tag.hide();
- *                    });
- */
-
-        this.drawMarkers();
-        plot_empty = false;
-
-    };
 
     this.numberToString = function(value) {
         return String(value.toFixed(e.precision()));
@@ -1019,7 +597,7 @@ function elapsd() {
 
     $("#threads_max").change(function(ev) {
         e._thread_limit = $(this).is(':checked');
-        e.changeDisplay();
+        changeDisplay(e, db_data);
     });
 
     $("#statistics_check").change(function(ev) {
@@ -1041,7 +619,136 @@ function elapsd() {
             $("body").css('background-color', '#222'); 
         //    $(".labels").css('fill', '#fff');
         }
-        e.changeDisplay();
+        changeDisplay(e, db_data);
     });
+    
+    this.replot = function() {
+
+        // Only if data is available
+        if ($.isEmptyObject(this._full_draw_data)) { return; }   
+
+        var draw_data = [];
+        $.each(this._full_draw_data, function(key,value) {
+
+            var obj = e._full_draw_data[key];
+            var data = obj.data;
+
+            var lo = bisect_l(data, x.domain()[0]) - 1;
+            var hi = bisect_r(data, x.domain()[1]) + 1;
+
+            if (lo == -1) { lo = 0; }
+            if (hi > (data.length - 1)) { hi = data.length; }
+
+            /* This merges elements that are to close to each other */
+            data_array = [[x(data[lo][0]),x(data[lo][1])]];
+            var start, stop;
+            var j = 0;
+            for (var i = lo + 1; i < hi; i++) {
+
+                start = x(data[i][0]);
+                stop  = x(data[i][1]);
+
+                if ((start - data_array[j][1]) < min_width) {
+                    data_array[j][1] = stop;
+                } else {
+                    data_array.push([start,stop]);
+                    j++;
+                }
+            }
+           
+            draw_data.push({
+                'data': data_array,
+                'y_idx': obj.y_idx,
+                'group_key': obj.group_key,
+                'color': obj.color
+            });
+
+        });
+        
+        this.clearPlot();
+
+        // Draw the grid
+        chart.selectAll("lines")
+             .data(x.ticks(num_ticks))
+             .enter()
+             .append("line")
+             .attr("class", "drawings")
+             .attr("x1", function(d) { return x(d) + 0.5; })
+             .attr("x2", function(d) { return x(d) + 0.5; })
+             .attr("y1", 0)
+             .attr("y2", $_chart.innerHeight())
+             .attr("id", "vgrid")
+             .style("stroke", "#888")
+             .style("stroke-width", "1.5px")
+             .style("stroke-dasharray", "5,5");
+
+        chart_seconds.selectAll(".seconds")
+                     .data(x.ticks(num_ticks))
+                     .enter()
+                     .append("text")
+                     .attr("class", "labels seconds drawings")
+                     .attr("x", x)
+                     .attr("y", $_chart_seconds.height() / 2)
+                     .attr("dy", -3)
+                     .attr("text-anchor", "middle")
+                     .style("fill", function() {
+                         if ($("#bg_light").is(':checked')) {
+                            return "#000"
+                         }
+                         return "#fff"
+                     })
+
+                     .text(function(value) {
+                         return d3.round(value / 1.0e9, 9) + " s";
+                     });
+
+        $.each(draw_data, function(idx,value) {
+
+            chart.selectAll("drawings")
+                 .data(value.data)
+                 .enter()
+                 .append("rect")
+                 .attr("class", "drawings")
+                 .attr("y", y(value.y_idx))
+                 .attr("x", function(d) { return d[0]; })
+                 .attr("width", function(d) {
+                     w = d[1] - d[0];
+                     if (w < min_width) { return min_width; }
+                     return w;
+                 })
+                 .attr("height", e._bar_height - e._bar_space)
+                 .attr("fill", value.color);
+        });
+
+
+/*
+ *                    .on("mousemove", function() {
+ *
+ *                        var rect_key = d3.event.target.id;
+ *                        var key = rect_key.replace("rect-", "");
+ *
+ *                        var x_pos = $(d3.event.target).position().left;
+ *                        var y_pos = parseInt($(d3.event.target).attr("width")) + x_pos;
+ *
+ *                        $_tag
+ *                            .show()
+ *                            .css('left', d3.event.pageX)
+ *                            .css('top', d3.event.pageY + $_tag.outerHeight())
+ *                            .text(
+ *                                (x.invert(x_pos - $_chart.position().left) / 1.0e9).toPrecision(e.precision()) + "s " +
+ *                                (x.invert(y_pos - $_chart.position().left) / 1.0e9).toPrecision(e.precision()) + "s " +
+ *                                db_data[key].length
+ *                            );
+ *
+ *                    })
+ *                    .on("mouseout", function() {
+ *                        $_tag.hide();
+ *                    });
+ */
+
+        this.drawMarkers();
+        plot_empty = false;
+
+    };
 
 }

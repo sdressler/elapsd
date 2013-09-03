@@ -94,6 +94,8 @@ elapsd::elapsd(
         std::string q_str = q.str();
         q_str.erase(q_str.end() - 2, q_str.end());
 
+        DMSG(q_str);
+
         db.executeInsertQuery(q_str);
 
     }
@@ -168,14 +170,6 @@ void elapsd::addSubDeviceToDevice(const int ID, const int sID) {
     // Add sID to ID
     tDeviceMap::iterator it = devices.find(ID);
     (it->second).addSubDevice(sID);
-}
-
-// Take a TimeSpec structure and convert it to double, seconds
-double elapsd::convTimeSpecToDoubleSeconds(const struct timespec &t) {
-    double tt = (double)t.tv_nsec * 1.0e-9;
-    tt += (double)t.tv_sec;
-
-    return tt;
 }
 
 void elapsd::addKernelDataVolumes(

@@ -1,0 +1,11 @@
+% : %.F90
+	@echo -e " $(G_COLOR)[ F90 ]$(NO_COLOR) : $< -> $@"
+	@$(FC) $(CXXFLAGS) $(LDFLAGS) -J../../include/elapsd $< -o $@
+
+% : %.cpp
+	@echo -e " $(G_COLOR)[ CXX ]$(NO_COLOR) : $< -> $@"
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+
+% : %.c
+	@echo -e " $(G_COLOR)[ CC  ]$(NO_COLOR) : $< -> $@"
+	@$(CC) $(CXXFLAGS) $(LDFLAGS) $< -o $@

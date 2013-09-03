@@ -23,6 +23,19 @@ namespace ENHANCE {
  * */
 class elapsdParams : public std::map<std::string, int> {
 
+public:
+    std::vector<elapsdParams::key_type> getKeys() const {
+    
+        std::vector<elapsdParams::key_type> k;
+
+        for (elapsdParams::const_iterator it = begin(); it != end(); ++it) {
+            k.push_back(it->first);
+        }
+
+        return k;
+
+    }
+
 };
 }
 

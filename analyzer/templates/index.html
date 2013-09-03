@@ -15,10 +15,16 @@
 
     <div id="overlay">
         <div id="db_selector" class="container">
+            <div class="title">Analysis mode</div>
+            <div style="margin-top: 10px"></div>
+            <div><input type="radio" name="analysis_mode" id="analysis" checked /><label for="analysis">Analysis</label></div>
+            <div><input type="radio" name="analysis_mode" id="prediction" /><label for="prediction">Prediction</label></div>
+            <div style="margin-top: 20px"></div>
             <div id="db_entries">
             <div class="title">Select the DB you want to work with...</div>
+            <div style="margin-top: 10px"></div>
             {% for db in dbs %}
-                <div class="db_entry selectable" onclick="e.changeDB('{{ db }}', '#db_selector')">{{ db }}</div>
+                <div class="db_entry selectable" onclick="runAnalysis('{{ db }}', '#db_selector')">{{ db }}</div>
             {% endfor %}
             </div>
         </div>
@@ -55,8 +61,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.1.6/d3.min.js"></script>
 
     <script type="text/javascript" src="{{url_for('static', filename='js/3rdparty/spin.min.js') }}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='js/elapsd.js') }}"></script>
+    <!--
+       -<script type="text/javascript" src="{{url_for('static', filename='js/elapsd.js') }}"></script>
+       -->
     <script type="text/javascript" src="{{url_for('static', filename='js/document.js') }}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/ajax.js') }}"></script>
 
 </body>
 </html>
