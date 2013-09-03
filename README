@@ -86,6 +86,10 @@ provided examples for more details.
 Changelog
 ---------
 
+### 2013-09-03 -- v0.3
+* Added prediction library with Lagrange model
+* Extended analyzer to visualize predictions
+
 ### 2013-07-30 -- v0.2
 * Added ability to store additional parameters for an experiment
 
