@@ -1,4 +1,4 @@
-#include "../include/elapsd/celapsd.h"
+#include <elapsd/celapsd.h>
 
 #include <stdio.h>
 #include <stdlib.h>

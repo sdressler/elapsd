@@ -27,14 +27,14 @@ int main(int argc, char *argv[]) {
     elapsdParamsAddParam(param, "FIB", F);
 
     /* Initialize elaps'd */
-    elapsd *e = elapsdInit("elapsd_predict.db", "Fibonacci C", param);
+    elapsd *e = elapsdInit("elapsd_predict_c.db", "Fibonacci C", param);
 
     /* Add Kernel and Device */
     elapsdAddKernel(e, 0, "Fibonacci");
     elapsdAddDevice(e, 0, "CPU");
 
     /* Initialize runtime predictor for Kernel = 0 and Device = 0 */
-    predict *p = predictInit("elapsd_predict.db", param, 0, 0);
+    predict *p = predictInit("elapsd_predict_c.db", param, 0, 0);
 
     /* TRY to initialize prediction, if no success, continue collecting data */
     int pred_err = predictCreatePredictionModel_Lagrange(p);

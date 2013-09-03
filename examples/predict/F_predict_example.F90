@@ -45,7 +45,7 @@ print '(a)',"elapsdParamsAddParam"
          stop 'Error in elapsdParamsAddParam'
       end if      
 print '(a)', "elapsdInit: elapsd.db"
-      elapsd = elapsdInit("elapsd.db" // C_NULL_CHAR , &
+      elapsd = elapsdInit("elapsd_predict_F.db" // C_NULL_CHAR , &
       &                 "Fibonacci FORTRAN" // C_NULL_CHAR, elapsd_params)
 
 print '(a)', "Adding kernel."
@@ -61,9 +61,9 @@ print '(a)', "Adding device"
          stop 'Error in elapsdAddDevice'
       end if      
 print '(a)', "Initialize runtime predictor for Kernel = 0 and Device = 0"
-      p = predictInit("elapsd.db", elapsd_params, 0_C_INT, 0_C_INT)
+      p = predictInit("elapsd_predict_F.db", elapsd_params, 0_C_INT, 0_C_INT)
 print '(a)', "TRY to initialize prediction, if no success, continue collecting&
-              data"
+&             data"
       pred_err = predictCreatePredictionModel_Lagrange(p)     
 print '(a)', "Make a prediction, if pred_err == E_OK"  
       FIB_time_pred = -1.0;
