@@ -11,6 +11,9 @@ WITH_FAPI = YES
 # Change to set maximum number of measurement units
 MAX_UNITS = 1024
 
+# Change this to "YES" if the system is OS X
+SYS_OSX = 
+
 # Change to "YES" to enable DEBUG mode, NORMAL when empty
 DEBUG = 
 
@@ -27,7 +30,10 @@ CXXFLAGS = -Wall -Werror=return-type \
            
 FFLAGS = -std=f2003 -J../../include/elapsd
 
-LLIB = -lrt -lsqlite3 -fopenmp
+LLIB = $(if $(SYS_OSX),,-lrt) \
+	   -lsqlite3 -fopenmp
+	   
+LIB_EXT = $(if $(SYS_OSX),dylib,so)
 
 # Colors
 NO_COLOR=\x1b[0m

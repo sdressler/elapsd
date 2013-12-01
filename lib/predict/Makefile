@@ -26,10 +26,10 @@ endif
 INC = $(wildcard ../../include/elapsd/*.h) $(wildcard ../../include/elapsd/predict/*.h)
 
 all: pre_build $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
-	$(CXX) $(LDFLAGS) $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) -o $(TARGET_DIR)lib$(TARGET).so $(LLIB)
+	$(CXX) $(LDFLAGS) $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI) -o $(TARGET_DIR)lib$(TARGET).$(LIB_EXT) $(LLIB)
 
 clean:
-	rm -f $(TARGET_DIR)lib$(TARGET).so $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
+	rm -f $(TARGET_DIR)lib$(TARGET).$(LIB_EXT) $(OBJ_LIB) $(OBJ_CAPI) $(OBJ_FAPI)
 
 .PHONY: pre_build
 pre_build:

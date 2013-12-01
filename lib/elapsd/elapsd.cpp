@@ -14,6 +14,11 @@
 
 #include <ctime>
 
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 #include "../include/elapsd/elapsd.h"
 #include "../include/elapsd/SQLite.h"
 #include "../include/elapsd/celapsd.h"
@@ -52,7 +57,17 @@ elapsd::elapsd(
     experiment_name = expName;
     experiment_date = static_cast<long int>(std::time(NULL));
 
+#ifndef __MACH__
     clock_gettime(CLOCK_REALTIME, &experiment_starttime);
+#else
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+	clock_get_time(cclock, &mts);
+	
+	experiment_starttime.tv_sec = mts.tv_sec;
+	experiment_starttime.tv_nsec = mts.tv_nsec;
+#endif
 
     DMSG("ExpID: " << experiment_id);
 

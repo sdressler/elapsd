@@ -52,8 +52,13 @@ private:
     tDataVector data;
     std::vector<unsigned int> dataSizeVector;
 
-    inline pid_t getThreadID() const { return syscall(SYS_gettid); }
+#ifndef __MACH__
+	inline pid_t getThreadID() const { return syscall(SYS_gettid); }
     inline pid_t getThreadGroupID() const { return syscall(SYS_getpid); }
+#else
+	inline pid_t getThreadID() const { return syscall(SYS_thread_selfid); }
+	inline pid_t getThreadGroupID() const { return getpid(); }
+#endif
 
     std::string dbFileName;
     
